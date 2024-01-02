@@ -4,17 +4,19 @@ import java.util.Scanner;
 import java.net.ServerSocket;
 
 public class Server {
+    public static int port = 8081;
 
-	public ServerSocket mss = null;
-	public Socket clientSocket = null;
-	public Scanner netIn = null;
-	public PrintWriter pw = null;
+	public static ServerSocket mss = null;
+	public static Socket clientSocket = null;
+	public static Scanner netIn = null;
+	public static PrintWriter pw = null;
 
-    public void runServer() {
+    public static void main() {
         boolean serverActive = true;
 
         while(serverActive) {
             try {
+                mss = new ServerSocket(port);
 				// Establish connection with the client
 				clientSocket = mss.accept();
 				System.out.println("Client connected");
