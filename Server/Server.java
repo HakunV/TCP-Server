@@ -8,11 +8,15 @@ public class Server {
 
 	public static ServerSocket mss = null;
 	public static Socket clientSocket = null;
-	public static Scanner netIn = null;
-	public static PrintWriter pw = null;
+	public static BufferedInputStream bis = null;
+	public static BufferedOutputStream bos = null;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         boolean serverActive = true;
+        int n = 1024;
+        int nRead = 0;
+        byte[] data = new byte[1024];
+        String dataString = "";
 
         while(serverActive) {
             try {
@@ -22,18 +26,33 @@ public class Server {
 				System.out.println("Client connected");
                 
                 // En scanner der lytter til requests fra klienten
-                netIn = new Scanner(clientSocket.getInputStream());
+                bis = new BufferedInputStream(clientSocket.getInputStream());
+
                 // PrintWriter så vi kan skrive til klienten
-                pw = new PrintWriter(clientSocket.getOutputStream());
+                bos = new BufferedOutputStream(clientSocket.getOutputStream());
 			} catch (IOException e) {
 				System.out.println("Client not connected");
 			}
 
-            while (netIn.hasNextLine()) {
-                String line = netIn.nextLine();
-                System.out.println(line);
+            while ((nRead = bis.read(data, 0, n)) > -1) {
+                dataString = byteToHex(data);
                 
+                System.out.println(dataString);
             }
+
+            bis.close();
+            bos.close();
+            clientSocket.close();
+            mss.close();
+            serverActive = false;
         }
+    }
+
+    private static String byteToHex(byte[] byteArray) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : byteArray) {
+            sb.append(String.format("%02X ", b));
+        }
+        return sb.toString();
     }
 }
