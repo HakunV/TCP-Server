@@ -6,7 +6,7 @@ import java.util.*;
 
 public class Client {
     public static Socket client = null;
-    public static String ip = "localhost";
+    public static String ip = "10.0.0.5";
     public static int port = 4321;
     public static BufferedInputStream bis = null;
     public static BufferedOutputStream bos = null;
