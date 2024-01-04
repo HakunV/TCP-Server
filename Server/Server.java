@@ -4,14 +4,14 @@ import java.util.Scanner;
 import java.net.ServerSocket;
 
 public class Server {
-    public static int port = 8081;
+    public static int port = 4321;
 
 	public static ServerSocket mss = null;
 	public static Socket clientSocket = null;
 	public static Scanner netIn = null;
 	public static PrintWriter pw = null;
 
-    public static void main() {
+    public static void main(String[] args) {
         boolean serverActive = true;
 
         while(serverActive) {
