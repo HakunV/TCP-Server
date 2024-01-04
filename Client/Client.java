@@ -31,7 +31,7 @@ public class Client {
         while (active) {
             System.out.println("Write data");
 
-            String data = String.format("%h", scan.nextLine());
+            String data = scan.nextLine();
 
             System.out.println("Your input: " + data);
             System.out.println("Your input: " + data.toString());
