@@ -34,10 +34,11 @@ public class Server {
 				System.out.println("Client not connected");
 			}
 
-            while ((nRead = bis.read(data, 0, n)) > -1) {
+            while ((nRead = bis.read(data)) > -1) {
                 dataString = byteToHex(data);
                 
-                System.out.println(dataString);
+                System.out.println("Input: " + dataString);
+                System.out.println("Input: " + dataString.toString());
             }
 
             bis.close();
