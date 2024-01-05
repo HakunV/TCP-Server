@@ -6,7 +6,7 @@ import java.util.*;
 
 public class Client {
     public static Socket client = null;
-    public static String ip = "10.0.0.5";
+    public static String ip = "192.168.29.226";
     public static int port = 4321;
     public static BufferedInputStream bis = null;
     public static BufferedOutputStream bos = null;
@@ -34,7 +34,6 @@ public class Client {
             String data = scan.nextLine();
 
             System.out.println("Your input: " + data);
-            System.out.println("Your input: " + data.toString());
 
             byte[] b = hexStrToByteArr(data);
 
@@ -42,8 +41,6 @@ public class Client {
             bos.flush();
             bos.close();
         }
-
-        
     }
 
     private static byte[] hexStrToByteArr(String data) {

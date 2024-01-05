@@ -15,7 +15,7 @@ public class Server {
         boolean serverActive = true;
         int n = 1024;
         int nRead = 0;
-        byte[] data = new byte[1024];
+        byte[] data = new byte[512];
         String dataString = "";
 
         while(serverActive) {
@@ -38,7 +38,6 @@ public class Server {
                 dataString = byteToHex(data);
                 
                 System.out.println("Input: " + dataString);
-                System.out.println("Input: " + dataString.toString());
             }
 
             bis.close();
