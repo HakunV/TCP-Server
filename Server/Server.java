@@ -68,13 +68,13 @@ public class Server {
                         break;
                     case "80":
                         break;
-                    case "f3":
+                    case "F3":
                         break;
-                    case "f1":
+                    case "F1":
                         break;
-                    case "f2":
+                    case "F2":
                         break;
-                    case "8a":
+                    case "8A":
                         break;
                     default:
                         System.out.println("No such command");
@@ -91,6 +91,20 @@ public class Server {
     }
 
     private static void handleLogin() {
+        try {
+            respondToLogin();
+        } catch(IOException e) {
+            System.out.println("Fail to send");
+        }
+    }
+
+    private static void respondToLogin() throws IOException {
+        String respond = "787805010003D9DF0D0A";
+
+        byte[] bArr = hexStrToByteArr(respond);
+
+        bos.write(bArr);
+        bos.flush();
     }
 
     private static byte[] byteCutoff(byte[] dataT, int nRead) {
@@ -122,5 +136,15 @@ public class Server {
             sb.append(String.format("%02X ", b));
         }
         return sb.toString();
+    }
+
+    private static byte[] hexStrToByteArr(String data) {
+        int len = data.length();
+        byte[] bytes = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            bytes[i / 2] = (byte) ((Character.digit(data.charAt(i), 16) << 4)
+                                + Character.digit(data.charAt(i+1), 16));
+        }
+        return bytes;
     }
 }
