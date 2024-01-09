@@ -15,8 +15,10 @@ public class Server {
         boolean serverActive = true;
         int n = 1024;
         int nRead = 0;
-        byte[] data = new byte[512];
+        byte[] dataT = new byte[n];
         String dataString = "";
+        int packetLength = 0;
+        String protocolNum = "";
 
         while(serverActive) {
             try {
@@ -34,18 +36,84 @@ public class Server {
 				System.out.println("Client not connected");
 			}
 
-            while ((nRead = bis.read(data)) > -1) {
+            while ((nRead = bis.read(dataT)) > -1) {
+                byte[] data = byteCutoff(dataT, nRead);
                 dataString = byteToHex(data);
-                
-                System.out.println("Input: " + dataString);
-            }
 
-            bis.close();
-            bos.close();
-            clientSocket.close();
-            mss.close();
+                dataString = removeWhiteSpace(dataString);
+
+                System.out.println("Input: " + dataString);
+
+                packetLength = Integer.parseInt(dataString.substring(4, 6), 16);
+                System.out.println(packetLength);
+
+                protocolNum = dataString.substring(6, 8);
+
+                switch (protocolNum) {
+                    case "01":
+                        System.out.println("Login Message");
+                        handleLogin();
+                        break;
+                    case "22":
+                        break;
+                    case "12":
+                        break;
+                    case "13":
+                        break;
+                    case "15":
+                        break;
+                    case "26":
+                        break;
+                    case "16":
+                        break;
+                    case "80":
+                        break;
+                    case "f3":
+                        break;
+                    case "f1":
+                        break;
+                    case "f2":
+                        break;
+                    case "8a":
+                        break;
+                    default:
+                        System.out.println("No such command");
+                        break;
+                }
+            }
             serverActive = false;
         }
+
+        bis.close();
+        bos.close();
+        clientSocket.close();
+        mss.close();
+    }
+
+    private static void handleLogin() {
+    }
+
+    private static byte[] byteCutoff(byte[] dataT, int nRead) {
+        byte[] d = new byte[nRead];
+
+        for (int i = 0; i < nRead; i++) {
+            d[i] = dataT[i];
+        }
+        return d;
+    }
+
+    private static String removeWhiteSpace(String in) {
+        String out = "";
+ 
+        for (int i = 0; i < in.length(); i++) {
+            char ch = in.charAt(i);
+ 
+            // Checking whether is white space or not
+            if (!Character.isWhitespace(ch)) {
+                out += ch;
+            }
+        }
+        return out;
     }
 
     private static String byteToHex(byte[] byteArray) {
