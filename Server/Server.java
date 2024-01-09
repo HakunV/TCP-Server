@@ -59,6 +59,8 @@ public class Server {
                     case "12":
                         break;
                     case "13":
+                        System.out.println("Status Message");
+                        handleStatus();
                         break;
                     case "15":
                         break;
@@ -90,11 +92,28 @@ public class Server {
         mss.close();
     }
 
+    private static void handleStatus() {
+        try {
+            respondToStatus();
+        } catch(IOException e) {
+            System.out.println("Fail to send Status");
+        }
+    }
+
+    private static void respondToStatus() throws IOException {
+        String respond = "787805130003D9DF0D0A";
+
+        byte[] bArr = hexStrToByteArr(respond);
+
+        bos.write(bArr);
+        bos.flush();
+    }
+
     private static void handleLogin() {
         try {
             respondToLogin();
         } catch(IOException e) {
-            System.out.println("Fail to send");
+            System.out.println("Fail to send Login");
         }
     }
 
