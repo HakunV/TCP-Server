@@ -14,6 +14,7 @@ public class Server {
 
     public void run() throws IOException {
         boolean serverActive = true;
+        boolean sameCon = true;
         int n = 1024;
         int nRead = 0;
         byte[] dataT = new byte[n];
@@ -39,7 +40,8 @@ public class Server {
 				System.out.println("Client not connected");
 			}
 
-            while ((nRead = bis.read(dataT)) > -1) {
+            while (sameCon) {
+                nRead = bis.read(dataT);
                 byte[] data = byteCutoff(dataT, nRead);
                 dataString = byteToHex(data);
 
