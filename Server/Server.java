@@ -72,7 +72,7 @@ public class Server {
                             break;
                         case "13":
                             System.out.println("Status Message");
-                            handleStatus();
+                            handleStatus(dataString);
                             break;
                         case "15":
                             break;
@@ -108,7 +108,13 @@ public class Server {
         mss.close();
     }
 
-    private void handleStatus() {
+    private void handleStatus(String d) {
+        String tic = d.substring(4*byteSize, 5*byteSize);
+        String volLevel = d.substring(5*byteSize, 6*byteSize);
+        String sigStrength = d.substring(6*byteSize, 7*byteSize);
+        String alarm = d.substring(7*byteSize, 8*byteSize);
+        String language = d.substring(8*byteSize, 9*byteSize);
+        
         try {
             respondToStatus();
         } catch(IOException e) {
@@ -117,7 +123,18 @@ public class Server {
     }
 
     private void respondToStatus() throws IOException {
-        String respond = "787805130003D9DF0D0A";
+        String respond = "";
+
+        String protNum = "13";
+        String serialNum = "0003";
+        int packLenInt = (protNum.length() + serialNum.length())/2 + 2;
+        String packLenStr = String.format("%02X", packLenInt);
+        
+        respond = packLenStr + protNum + serialNum;
+        String crc = crcCalc(respond);
+        respond += crc;
+
+        respond = addStartEnd(respond);
 
         byte[] bArr = hexStrToByteArr(respond);
 
@@ -138,18 +155,18 @@ public class Server {
     }
 
     private void respondToLogin() throws IOException {
-        String respond = "787805010003D9DF0D0A";
+        String respond = "";
 
-        // String protNum = "01";
-        // String serialNum = "0003";
-        // int packLenInt = (protNum.length() + serialNum.length())/2 + 2;
-        // String packLenStr = String.format("%02X", packLenInt);
+        String protNum = "01";
+        String serialNum = "0003";
+        int packLenInt = (protNum.length() + serialNum.length())/2 + 2;
+        String packLenStr = String.format("%02X", packLenInt);
 
-        // respond = packLenStr + protNum + serialNum;
-        // String crc = crcCalc(respond);
-        // respond += crc;
+        respond = packLenStr + protNum + serialNum;
+        String crc = crcCalc(respond);
+        respond += crc;
 
-        // respond = addStartEnd(respond);
+        respond = addStartEnd(respond);
 
         byte[] bArr = hexStrToByteArr(respond);
 
