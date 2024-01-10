@@ -20,7 +20,7 @@ public class Server {
         String dataString = "";
         int packetLength = 0;
         String protocolNum = "";
-        int ISN = 0;
+        String isn = "";  // Might change to int
         String errCheck = "";
 
         while(serverActive) {
@@ -55,7 +55,8 @@ public class Server {
 
                     protocolNum = dataString.substring(3*byteSize, 4*byteSize);
 
-                    ISN = Integer.parseInt(dataString.substring(len-6*byteSize, len-4*byteSize), 16);
+                    // isn = Integer.parseInt(dataString.substring(len-6*byteSize, len-4*byteSize), 16);   // When isn is of type int
+                    isn = dataString.substring(len-6*byteSize, len-4*byteSize);
 
                     errCheck = dataString.substring(len-4*byteSize, len-2*byteSize);
 
@@ -64,7 +65,7 @@ public class Server {
                     switch (protocolNum) {
                         case "01":
                             System.out.println("Login Message");
-                            handleLogin(dataString);
+                            handleLogin(dataString, isn);
                             break;
                         case "22":
                             break;
@@ -72,7 +73,7 @@ public class Server {
                             break;
                         case "13":
                             System.out.println("Status Message");
-                            handleStatus(dataString);
+                            handleStatus(dataString, isn);
                             break;
                         case "15":
                             break;
@@ -108,7 +109,7 @@ public class Server {
         mss.close();
     }
 
-    private void handleStatus(String d) {
+    private void handleStatus(String d, String isn) {
         String tic = d.substring(4*byteSize, 5*byteSize);
         String volLevel = d.substring(5*byteSize, 6*byteSize);
         String sigStrength = d.substring(6*byteSize, 7*byteSize);
@@ -116,17 +117,17 @@ public class Server {
         String language = d.substring(8*byteSize, 9*byteSize);
         
         try {
-            respondToStatus();
+            respondToStatus(isn);
         } catch(IOException e) {
             System.out.println("Fail to send Status");
         }
     }
 
-    private void respondToStatus() throws IOException {
+    private void respondToStatus(String isn) throws IOException {
         String respond = "";
 
         String protNum = "13";
-        String serialNum = "0003";
+        String serialNum = isn;
         int packLenInt = (protNum.length() + serialNum.length())/2 + 2;
         String packLenStr = String.format("%02X", packLenInt);
         
@@ -142,23 +143,23 @@ public class Server {
         bos.flush();
     }
 
-    private void handleLogin(String d) {
+    private void handleLogin(String d, String isn) {
         String IMEI = d.substring(4*byteSize, 12*byteSize);
         String typeID = d.substring(12*byteSize, 14*byteSize);
         String timeZone = d.substring(14*byteSize, 16*byteSize);
 
         try {
-            respondToLogin();
+            respondToLogin(isn);
         } catch(IOException e) {
             System.out.println("Fail to send Login");
         }
     }
 
-    private void respondToLogin() throws IOException {
+    private void respondToLogin(String isn) throws IOException {
         String respond = "";
 
         String protNum = "01";
-        String serialNum = "0003";
+        String serialNum = isn;
         int packLenInt = (protNum.length() + serialNum.length())/2 + 2;
         String packLenStr = String.format("%02X", packLenInt);
 
