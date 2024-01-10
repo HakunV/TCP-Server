@@ -139,18 +139,18 @@ public class Server {
     }
 
     private void respondToLogin() throws IOException {
-        String respond = "";
+        String respond = "787805010003D9DF0D0A";
 
-        String protNum = "01";
-        String serialNum = "0003";
-        int packLenInt = (protNum.length() + serialNum.length())/2 + 2;
-        String packLenStr = String.format("%02X", packLenInt);
+        // String protNum = "01";
+        // String serialNum = "0003";
+        // int packLenInt = (protNum.length() + serialNum.length())/2 + 2;
+        // String packLenStr = String.format("%02X", packLenInt);
 
-        respond = packLenStr + protNum + serialNum;
-        String crc = crcCalc(respond);
-        respond += crc;
+        // respond = packLenStr + protNum + serialNum;
+        // String crc = crcCalc(respond);
+        // respond += crc;
 
-        respond = addStartEnd(respond);
+        // respond = addStartEnd(respond);
 
         byte[] bArr = hexStrToByteArr(respond);
 
