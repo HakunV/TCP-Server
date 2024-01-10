@@ -68,7 +68,7 @@ public class Server {
                         case "01":
                             System.out.println("Login Message");
                             handleLogin(dataString, isn);
-                            sendCommand();
+                            sendCommand(isn);
                             break;
                         case "22":
                             break;
@@ -112,8 +112,29 @@ public class Server {
         mss.close();
     }
 
-    private void sendCommand() throws IOException {
-        String respond = "787811800b0053017553544154555323000050f20d0a";
+    private void sendCommand(String isn) throws IOException {
+        String respond = "";
+
+        String protNum = "80";
+        String serverFlags = "00000001";
+        String command = "3C535042534A2A503A42534A4750532A33503A783E";
+        String language = "0002";
+
+        int isnInt = Integer.parseInt(isn, 16);
+        String serNum = String.format("%04X", isnInt+1);
+
+        int commandLen = command.length()/2;
+
+        respond = protNum + commandLen + serverFlags + command + language + serNum;
+
+        int packLenInt = respond.length()/2+2;
+        String packLenStr = String.format("%02X", packLenInt);
+
+        respond = packLenStr + respond;
+        String crc = crcCalc(respond);
+        respond += crc;
+
+        respond = addStartEnd(respond);
 
         byte[] bArr = hexStrToByteArr(respond);
 
