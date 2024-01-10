@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.net.ServerSocket;
 import java.util.*;
 
 public class Client {
