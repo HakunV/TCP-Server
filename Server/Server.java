@@ -4,7 +4,7 @@ import java.util.Scanner;
 import java.net.ServerSocket;
 
 public class Server {
-    public int port = 4321;
+    public int port = 6666;
 
 	public ServerSocket mss = null;
 	public Socket clientSocket = null;
