@@ -4,14 +4,16 @@ import java.util.Scanner;
 import java.net.ServerSocket;
 
 public class Server {
-    public static int port = 4321;
+    public int port = 4321;
 
-	public static ServerSocket mss = null;
-	public static Socket clientSocket = null;
-	public static BufferedInputStream bis = null;
-	public static BufferedOutputStream bos = null;
+	public ServerSocket mss = null;
+	public Socket clientSocket = null;
+	public BufferedInputStream bis = null;
+	public BufferedOutputStream bos = null;
 
-    public static void main(String[] args) throws IOException {
+    public int byteSize = 2;
+
+    public void run() throws IOException {
         boolean serverActive = true;
         int n = 1024;
         int nRead = 0;
@@ -19,6 +21,8 @@ public class Server {
         String dataString = "";
         int packetLength = 0;
         String protocolNum = "";
+        int ISN = 0;
+        String errCheck = "";
 
         while(serverActive) {
             try {
@@ -42,45 +46,58 @@ public class Server {
 
                 dataString = removeWhiteSpace(dataString);
 
+                int len = dataString.length();
+
                 System.out.println("Input: " + dataString);
 
-                packetLength = Integer.parseInt(dataString.substring(4, 6), 16);
-                System.out.println(packetLength);
+                if (dataString.substring(0, 2*byteSize).equals("7878")) {
+                    packetLength = Integer.parseInt(dataString.substring(2*byteSize, 3*byteSize), 16);
+                    System.out.println(packetLength);
 
-                protocolNum = dataString.substring(6, 8);
+                    protocolNum = dataString.substring(3*byteSize, 4*byteSize);
 
-                switch (protocolNum) {
-                    case "01":
-                        System.out.println("Login Message");
-                        handleLogin();
-                        break;
-                    case "22":
-                        break;
-                    case "12":
-                        break;
-                    case "13":
-                        System.out.println("Status Message");
-                        handleStatus();
-                        break;
-                    case "15":
-                        break;
-                    case "26":
-                        break;
-                    case "16":
-                        break;
-                    case "80":
-                        break;
-                    case "F3":
-                        break;
-                    case "F1":
-                        break;
-                    case "F2":
-                        break;
-                    case "8A":
-                        break;
-                    default:
-                        System.out.println("No such command");
-                        break;
+                    ISN = Integer.parseInt(dataString.substring(len-6*byteSize, len-4*byteSize), 16);
+
+                    errCheck = dataString.substring(len-4*byteSize, len-2*byteSize);
+
+                    System.out.println(errorCheck(dataString.substring(4, len-4*byteSize), errCheck));
+
+                    switch (protocolNum) {
+                        case "01":
+                            System.out.println("Login Message");
+                            handleLogin(dataString);
+                            break;
+                        case "22":
+                            break;
+                        case "12":
+                            break;
+                        case "13":
+                            System.out.println("Status Message");
+                            handleStatus();
+                            break;
+                        case "15":
+                            break;
+                        case "26":
+                            break;
+                        case "16":
+                            break;
+                        case "80":
+                            break;
+                        case "f3":
+                            break;
+                        case "f1":
+                            break;
+                        case "f2":
+                            break;
+                        case "8a":
+                            break;
+                        default:
+                            System.out.println("No such command");
+                            break;
+                    }
+                }
+                else {
+                    System.out.println("Wrong start");
                 }
             }
             serverActive = false;
@@ -92,7 +109,7 @@ public class Server {
         mss.close();
     }
 
-    private static void handleStatus() {
+    private void handleStatus() {
         try {
             respondToStatus();
         } catch(IOException e) {
@@ -100,7 +117,7 @@ public class Server {
         }
     }
 
-    private static void respondToStatus() throws IOException {
+    private void respondToStatus() throws IOException {
         String respond = "787805130003D9DF0D0A";
 
         byte[] bArr = hexStrToByteArr(respond);
@@ -109,7 +126,11 @@ public class Server {
         bos.flush();
     }
 
-    private static void handleLogin() {
+    private void handleLogin(String d) {
+        String IMEI = d.substring(4*byteSize, 12*byteSize);
+        String typeID = d.substring(12*byteSize, 14*byteSize);
+        String timeZone = d.substring(14*byteSize, 16*byteSize);
+
         try {
             respondToLogin();
         } catch(IOException e) {
@@ -117,8 +138,19 @@ public class Server {
         }
     }
 
-    private static void respondToLogin() throws IOException {
-        String respond = "787805010003D9DF0D0A";
+    private void respondToLogin() throws IOException {
+        String respond = "";
+
+        String protNum = "01";
+        String serialNum = "0003";
+        int packLenInt = (protNum.length() + serialNum.length())/2 + 2;
+        String packLenStr = String.format("%02X", packLenInt);
+
+        respond = packLenStr + protNum + serialNum;
+        String crc = crcCalc(respond);
+        respond += crc;
+
+        respond = addStartEnd(respond);
 
         byte[] bArr = hexStrToByteArr(respond);
 
@@ -126,7 +158,11 @@ public class Server {
         bos.flush();
     }
 
-    private static byte[] byteCutoff(byte[] dataT, int nRead) {
+    private String addStartEnd(String str) {
+        return "7878" + str + "0d0a";
+    }
+
+    private byte[] byteCutoff(byte[] dataT, int nRead) {
         byte[] d = new byte[nRead];
 
         for (int i = 0; i < nRead; i++) {
@@ -135,7 +171,7 @@ public class Server {
         return d;
     }
 
-    private static String removeWhiteSpace(String in) {
+    private String removeWhiteSpace(String in) {
         String out = "";
  
         for (int i = 0; i < in.length(); i++) {
@@ -149,7 +185,7 @@ public class Server {
         return out;
     }
 
-    private static String byteToHex(byte[] byteArray) {
+    private String byteToHex(byte[] byteArray) {
         StringBuilder sb = new StringBuilder();
         for (byte b : byteArray) {
             sb.append(String.format("%02X ", b));
@@ -157,7 +193,7 @@ public class Server {
         return sb.toString();
     }
 
-    private static byte[] hexStrToByteArr(String data) {
+    private byte[] hexStrToByteArr(String data) {
         int len = data.length();
         byte[] bytes = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
@@ -165,5 +201,16 @@ public class Server {
                                 + Character.digit(data.charAt(i+1), 16));
         }
         return bytes;
+    }
+
+    private String crcCalc(String data) {
+        byte[] dataArr = hexStrToByteArr(data);
+        CRC_Table crcObj = new CRC_Table();
+        return crcObj.getCRC(dataArr);
+    }
+
+    private boolean errorCheck(String data, String comp) {
+        String res = crcCalc(data);
+        return res.equalsIgnoreCase(comp);
     }
 }
