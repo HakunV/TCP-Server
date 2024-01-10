@@ -68,6 +68,7 @@ public class Server {
                         case "01":
                             System.out.println("Login Message");
                             handleLogin(dataString, isn);
+                            sendCommand();
                             break;
                         case "22":
                             break;
@@ -109,6 +110,15 @@ public class Server {
         bos.close();
         clientSocket.close();
         mss.close();
+    }
+
+    private void sendCommand() throws IOException {
+        String respond = "787811800b0053017553544154555323000050f20d0a";
+
+        byte[] bArr = hexStrToByteArr(respond);
+
+        bos.write(bArr);
+        bos.flush();
     }
 
     private void handleStatus(String d, String isn) {
