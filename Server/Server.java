@@ -50,23 +50,29 @@ public class Server {
                 int len = dataString.length();
 
                 System.out.println("Input: " + dataString);
+                System.out.println();
 
                 if (dataString.substring(0, 2*byteSize).equals("7878")) {
                     packetLength = Integer.parseInt(dataString.substring(2*byteSize, 3*byteSize), 16);
-                    System.out.println(packetLength);
+                    System.out.println("Length of the packet: " + packetLength);
+                    System.out.println();
 
                     protocolNum = dataString.substring(3*byteSize, 4*byteSize);
 
                     // isn = Integer.parseInt(dataString.substring(len-6*byteSize, len-4*byteSize), 16);   // When isn is of type int
                     isn = dataString.substring(len-6*byteSize, len-4*byteSize);
+                    System.out.println("Information Serial Number: " + isn);
+                    System.out.println();
 
                     errCheck = dataString.substring(len-4*byteSize, len-2*byteSize);
 
                     System.out.println(errorCheck(dataString.substring(4, len-4*byteSize), errCheck));
+                    System.out.println();
 
                     switch (protocolNum) {
                         case "01":
                             System.out.println("Login Message");
+                            System.out.println();
                             handleLogin(dataString, isn);
                             sendCommand(isn);
                             break;
@@ -76,9 +82,11 @@ public class Server {
                             break;
                         case "13":
                             System.out.println("Status Message");
+                            System.out.println();
                             handleStatus(dataString, isn);
                             break;
                         case "15":
+                            System.out.println("Command Response");
                             break;
                         case "26":
                             break;
@@ -144,15 +152,225 @@ public class Server {
 
     private void handleStatus(String d, String isn) {
         String tic = d.substring(4*byteSize, 5*byteSize);
+        System.out.println("Terminal Information Content:");
+        checkTic(tic);
+
         String volLevel = d.substring(5*byteSize, 6*byteSize);
+        System.out.println("Voltage Level:");
+        checkVol(volLevel);
+
         String sigStrength = d.substring(6*byteSize, 7*byteSize);
+        System.out.println("Signal Strength:");
+        checkSig(sigStrength);
+
         String alarm = d.substring(7*byteSize, 8*byteSize);
+        System.out.println("Alarm:");
+        checkAlarm(alarm);
+
         String language = d.substring(8*byteSize, 9*byteSize);
+        System.out.println("Language:");
+        checkLanguage(language);
         
         try {
             respondToStatus(isn);
         } catch(IOException e) {
             System.out.println("Fail to send Status");
+        }
+    }
+
+    private void checkTic(String tic) {
+        int ticInt = Integer.parseInt(tic, 16);
+        String t = String.format("%8s", ticInt).replace(" ", "0");
+
+        if (t.substring(0, 1).equals("1")) {
+            System.out.println("    Oil and Electricity: Disconnected");
+            System.out.println();
+        }
+        else {
+            System.out.println("    Oil and Electricity: Connected");
+            System.out.println();
+        }
+
+        if (t.substring(1, 2).equals("1")) {
+            System.out.println("    GPS Tracking: On");
+            System.out.println();
+        }
+        else {
+            System.out.println("    GPS Tracking: Off");
+            System.out.println();
+        }
+
+        System.out.println("    Alarm Status");
+        switch (t.substring(4, 5) + t.substring(3, 4) + t.substring(2, 3)) {
+            case "000":
+                System.out.print(" Normal");
+                System.out.println();
+                break;
+            case "001":
+                System.out.print("Shock Alarm");
+                System.out.println();
+                break;
+            case "010":
+                System.out.print(" Power Cut Alarm");
+                System.out.println();
+                break;
+            case "011":
+                System.out.print(" Low Battery Alarm");
+                System.out.println();
+                break;
+            case "100":
+                System.out.print(" SOS");
+                System.out.println();
+                break;
+            default:
+                System.out.print(" Not known");
+                System.out.println();
+                break;
+        }
+
+        if (t.substring(5, 6).equals("1")) {
+            System.out.println("    Charge: On");
+            System.out.println();
+        }
+        else {
+            System.out.println("    Charge: Off");
+            System.out.println();
+        }
+
+        if (t.substring(6, 7).equals("1")) {
+            System.out.println("    ACC: High");
+            System.out.println();
+        }
+        else {
+            System.out.println("    ACC: Low");
+            System.out.println();
+        }
+
+        if (t.substring(7).equals("1")) {
+            System.out.println("    Air Condition: On");
+            System.out.println();
+        }
+        else {
+            System.out.println("Air Condition: Off");
+            System.out.println();
+        }
+    }
+
+    private void checkLanguage(String language) {
+        switch (language) {
+            case "01":
+                System.out.println("    Language is Chinese");
+                System.out.println();
+                break;
+            case "02":
+                System.out.println("    Language is English");
+                System.out.println();
+                break;
+            default:
+                System.out.println("    Not known");
+                break;
+        }
+    }
+
+    private void checkAlarm(String alarm) {
+        int a = Integer.parseInt(alarm, 16);
+
+        switch (a) {
+            case 0:
+                System.out.println("    Normal");
+                System.out.println();
+                break;
+            case 1:
+                System.out.println("    SOS");
+                System.out.println();
+                break;
+            case 2:
+                System.out.println("    Power Cut Alarm");
+                System.out.println();
+                break;
+            case 3:
+                System.out.println("    Shock Alarm");
+                System.out.println();
+                break;
+            case 4:
+                System.out.println("    Fence In Alarm");
+                System.out.println();
+                break;
+            case 5:
+                System.out.println("    Fence Out Alarm");
+                System.out.println();
+                break;
+            default:
+                System.out.println("    Not known");
+                break;
+        }
+    }
+
+    private void checkVol(String volLevel) {
+        int vol = Integer.parseInt(volLevel, 16);
+
+        switch (vol) {
+            case 0:
+                System.out.println("    No power");
+                System.out.println();
+                break;
+            case 1:
+                System.out.println("    Extremely low power");
+                System.out.println();
+                break;
+            case 2:
+                System.out.println("    Very low battery");
+                System.out.println();
+                break;
+            case 3:
+                System.out.println("    Low battery");
+                System.out.println();
+                break;
+            case 4:
+                System.out.println("    Medium");
+                System.out.println();
+                break;
+            case 5:
+                System.out.println("    High");
+                System.out.println();
+                break;
+            case 6:
+                System.out.println("    Very high");
+                System.out.println();
+                break;
+            default:
+                System.out.println("    Not known");
+                break;
+        }
+    }
+
+    private void checkSig(String sig) {
+        int s = Integer.parseInt(sig, 16);
+
+        switch (s) {
+            case 0:
+                System.out.println("    No signal");
+                System.out.println();
+                break;
+            case 1:
+                System.out.println("    Extremely weak signal");
+                System.out.println();
+                break;
+            case 2:
+                System.out.println("    Very weak signal");
+                System.out.println();
+                break;
+            case 3:
+                System.out.println("    Good signal");
+                System.out.println();
+                break;
+            case 4:
+                System.out.println("    Strong signal");
+                System.out.println();
+                break;
+            default:
+                System.out.println("    Not known");
+                break;
         }
     }
 
@@ -177,15 +395,33 @@ public class Server {
     }
 
     private void handleLogin(String d, String isn) {
-        String IMEI = d.substring(4*byteSize, 12*byteSize);
+        String imei = d.substring(4*byteSize, 12*byteSize);
+        imei = removeProZeros(imei);
+        System.out.println("IMEI number: " + imei);
+        System.out.println();
+
         String typeID = d.substring(12*byteSize, 14*byteSize);
+        System.out.println("Type ID: " + typeID);
+        System.out.println();
+
         String timeZone = d.substring(14*byteSize, 16*byteSize);
+        System.out.println("Time zone: " + timeZone);
+        System.out.println();
 
         try {
             respondToLogin(isn);
         } catch(IOException e) {
             System.out.println("Fail to send Login");
         }
+    }
+
+    private String removeProZeros(String imei) {
+        int i = 0;
+        while(imei.charAt(i) == '0') {
+            i += 1;
+        }
+
+        return imei.substring(i);
     }
 
     private void respondToLogin(String isn) throws IOException {
