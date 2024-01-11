@@ -77,6 +77,9 @@ public class Server {
                             sendCommand(isn);
                             break;
                         case "22":
+                            System.out.println("Location Message");
+                            System.out.println();
+                            handleLocation(dataString);
                             break;
                         case "12":
                             break;
@@ -118,6 +121,241 @@ public class Server {
         bos.close();
         clientSocket.close();
         mss.close();
+    }
+
+    private void handleLocation(String d) {
+        String dateAndTime = d.substring(4*byteSize, 10*byteSize);
+        System.out.println("Date and Time:");
+        checkDate(dateAndTime);
+
+        String gpsQual = d.substring(10*byteSize, 11*byteSize);
+        System.out.println("Quality of GPS:");
+        checkGPS(gpsQual);
+
+        String latitude = d.substring(11*byteSize, 15*byteSize);
+        System.out.println("Latitude:");
+        checkLat(latitude);
+
+        String longitude = d.substring(15*byteSize, 19*byteSize);
+        System.out.println("Longitude:");
+        checkLong(longitude);
+
+        String speed = d.substring(19*byteSize, 20*byteSize);
+        System.out.println("Speed:");
+        checkSpeed(speed);
+
+        String course = d.substring(20*byteSize, 22*byteSize);
+        System.out.println("Course and Status:");
+        checkCourse(course);
+
+        String mcc = d.substring(22*byteSize, 24*byteSize);
+        System.out.println("Mobile Country Code:");
+        checkMcc(mcc);
+
+        String mnc = d.substring(24*byteSize, 25*byteSize);
+        System.out.println("Mobile Network Code:");
+        checkMnc(mnc);
+
+        String lac = d.substring(25*byteSize, 27*byteSize);
+        System.out.println("Location Area Code:");
+        checkLac(lac);
+
+        String cellID = d.substring(27*byteSize, 30*byteSize);
+        System.out.println("Cell ID:");
+        checkCell(cellID);
+
+        String acc = d.substring(30*byteSize, 31*byteSize);
+        System.out.println("ACC:");
+        checkAcc(acc);
+
+        String escalation = d.substring(31*byteSize, 32*byteSize);
+        System.out.println("Data Escalation Mode:");
+        checkEsc(escalation);
+
+        String realTime = d.substring(32*byteSize, 33*byteSize);
+        System.out.println("GPS Real-time Retransmission:");
+        checkReal(realTime);
+    }
+
+    private void checkCourse(String course) {
+        int courseInt = Integer.parseInt(course, 16);
+        String c = String.format("%16s", Integer.toBinaryString(courseInt)).replace(" ", "0");
+
+        if (c.substring(0, 1).equals("1")) {
+            System.out.println("    ACC: On");
+            System.out.println();
+        }
+        else {
+            System.out.println("    ACC: Off");
+            System.out.println();
+        }
+
+        if (c.substring(1, 2).equals("1")) {
+            System.out.println("    Input2: On");
+            System.out.println();
+        }
+        else {
+            System.out.println("    Input2: Off");
+            System.out.println();
+        }
+
+        if (c.substring(2, 3).equals("1")) {
+            System.out.println("    GPS: Real-time");
+            System.out.println();
+        }
+        else {
+            System.out.println("    GPS: Differential Positioning");
+            System.out.println();
+        }
+
+        if (c.substring(3, 4).equals("1")) {
+            System.out.println("    GPS: Positioned");
+            System.out.println();
+        }
+        else {
+            System.out.println("    GPS: Not Positioned");
+            System.out.println();
+        }
+
+        if (c.substring(4, 5).equals("1")) {
+            System.out.println("    Longitude: West");
+            System.out.println();
+        }
+        else {
+            System.out.println("    Longitude: East");
+            System.out.println();
+        }
+
+        if (c.substring(5, 6).equals("1")) {
+            System.out.println("    Latitude: North");
+            System.out.println();
+        }
+        else {
+            System.out.println("    Latitude: South");
+            System.out.println();
+        }
+
+        int courseDegrees = Integer.parseInt(c.substring(6), 2);
+        System.out.println("    Course In Degrees: " + courseDegrees);
+        System.out.println();
+    }
+
+    private void checkReal(String realTime) {
+        if (realTime.equals("01")) {
+            System.out.println("    Differential Positioning Upload");
+            System.out.println();
+        }
+        else {
+            System.out.println("    Not Known");
+            System.out.println();
+        }
+    }
+
+    private void checkEsc(String escalation) {
+        if (escalation.equals("00")) {
+            System.out.println("    Timed Upload");
+            System.out.println();
+        }
+        else {
+            System.out.println("    Not Known");
+            System.out.println();
+        }
+    }
+
+    private void checkAcc(String acc) {
+        if (acc.equals("00")) {
+            System.out.println("    ACC is Off");
+            System.out.println();
+        }
+        else {
+            System.out.println("    Not Known");
+            System.out.println();
+        }
+    }
+
+    private void checkCell(String cellID) {
+        int c = Integer.parseInt(cellID, 16);
+
+        System.out.println("    " + c);
+        System.out.println();
+    }
+
+    private void checkLac(String lac) {
+        int l = Integer.parseInt(lac, 16);
+
+        System.out.println("    " + l);
+        System.out.println();
+    }
+
+    private void checkMnc(String mnc) {
+        int m = Integer.parseInt(mnc, 16);
+
+        System.out.println("    " + m);
+        System.out.println();
+    }
+
+    private void checkMcc(String mcc) {
+        int m = Integer.parseInt(mcc, 16);
+
+        System.out.println("    " + m);
+        System.out.println();
+    }
+
+    private void checkSpeed(String speed) {
+        int s = Integer.parseInt(speed, 16);
+
+        System.out.println("    " + s + " km/h");
+        System.out.println();
+    }
+
+    private void checkLong(String longitude) {
+        int longInt = Integer.parseInt(longitude, 16);
+
+        float longFloat = ((float) 180 / (float) 324000000)*longInt;
+
+        System.out.println("    " + longFloat);
+        System.out.println();
+    }
+
+    private void checkLat(String latitude) {
+        int latInt = Integer.parseInt(latitude, 16);
+
+        float latDouble = ((float) 90 / (float) 162000000)*latInt;
+
+        System.out.println("    " + latDouble);
+        System.out.println();
+    }
+
+    private void checkGPS(String str) {
+        int gpsBits = Integer.parseInt(str.substring(0, 1), 16);
+        System.out.println("    Bits of GPS Info: " + gpsBits);
+        System.out.println();
+
+        int sat = Integer.parseInt(str.substring(1), 16);
+        System.out.println("    Satelittes connected: " + sat);
+        System.out.println();
+    }
+
+    private void checkDate(String dateAndTime) {
+        int year = Integer.parseInt(dateAndTime.substring(0, 1*byteSize), 16);
+        System.out.print("    20" + year);
+
+        int month = Integer.parseInt(dateAndTime.substring(1*byteSize, 2*byteSize), 16);
+        System.out.print("." + month);
+
+        int day = Integer.parseInt(dateAndTime.substring(2*byteSize, 3*byteSize), 16);
+        System.out.print("." + day);
+
+        int hour = Integer.parseInt(dateAndTime.substring(3*byteSize, 4*byteSize), 16);
+        System.out.print("   " + hour);
+
+        int minute = Integer.parseInt(dateAndTime.substring(4*byteSize, 5*byteSize), 16);
+        System.out.print("." + minute);
+
+        int second = Integer.parseInt(dateAndTime.substring(5*byteSize), 16);
+        System.out.print("." + second);
+        System.out.println();
+        System.out.println();
     }
 
     private void sendCommand(String isn) throws IOException {
