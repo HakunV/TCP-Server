@@ -74,7 +74,6 @@ public class Server {
                             System.out.println("Login Message");
                             System.out.println();
                             handleLogin(dataString, isn);
-                            // sendCommand(isn);
                             break;
                         case "22":
                             System.out.println("Location Message");
@@ -87,6 +86,7 @@ public class Server {
                             System.out.println("Status Message");
                             System.out.println();
                             handleStatus(dataString, isn);
+                            sendCommand(isn);
                             break;
                         case "15":
                             System.out.println("Command Response");
@@ -363,7 +363,7 @@ public class Server {
 
         String protNum = "80";
         String serverFlags = "00000001";
-        String command = "3C535042534A2A503A42534A4750532A33503A783E";
+        String command = "54494D45522C313023";
         String language = "0002";
 
         int isnInt = Integer.parseInt(isn, 16);
