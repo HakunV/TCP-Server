@@ -363,7 +363,9 @@ public class Server {
 
         String protNum = "80";
         String serverFlags = "00000001";
-        String command = "54494D45522C313023";
+        //String command = "54494D45522C313023"; // 10 Min or 10 sec
+        String command = "54494D45522C3123"; // 1 Min or 1 sec
+
         String language = "0002";
 
         int isnInt = Integer.parseInt(isn, 16);
