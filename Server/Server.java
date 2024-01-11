@@ -74,7 +74,7 @@ public class Server {
                             System.out.println("Login Message");
                             System.out.println();
                             handleLogin(dataString, isn);
-                            sendCommand(isn);
+                            // sendCommand(isn);
                             break;
                         case "22":
                             System.out.println("Location Message");
