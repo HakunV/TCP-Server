@@ -370,8 +370,9 @@ public class Server {
         String serNum = String.format("%04X", isnInt+1);
 
         int commandLen = command.length()/2;
+        String comLenStr = String.format("%02X", commandLen);
 
-        respond = protNum + commandLen + serverFlags + command + language + serNum;
+        respond = protNum + comLenStr + serverFlags + command + language + serNum;
 
         int packLenInt = respond.length()/2+2;
         String packLenStr = String.format("%02X", packLenInt);
