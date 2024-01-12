@@ -3,7 +3,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
 
-public class Client {
+public class ClientDummy {
     public static Socket client = null;
     public static String ip = "localhost";
     public static int port = 6666;
@@ -38,8 +38,8 @@ public class Client {
 
             bos.write(b);
             bos.flush();
-            bos.close();
         }
+        bos.close();
     }
 
     private static byte[] hexStrToByteArr(String data) {

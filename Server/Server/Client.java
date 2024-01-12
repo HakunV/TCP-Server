@@ -1,19 +1,22 @@
+package Server;
+
 import java.io.*;
 import java.net.Socket;
-import java.net.ServerSocket;
 
-public class Server {
-    public int port = 6666;
-
-	public ServerSocket mss = null;
-	public Socket clientSocket = null;
-	public BufferedInputStream bis = null;
-	public BufferedOutputStream bos = null;
+public class Client implements Runnable {
+    public Socket socket;
+    public Server server;
+    public BufferedInputStream bis;
+    public BufferedOutputStream bos;
 
     public int byteSize = 2;
 
-    public void run() throws IOException {
-        boolean serverActive = true;
+    public Client(Socket socket, Server server) {
+        this.socket = socket;
+        this.server = server;
+    }
+
+    public void run() {
         boolean sameCon = true;
         int n = 1024;
         int nRead = 0;
@@ -24,103 +27,99 @@ public class Server {
         String isn = "";  // Might change to int
         String errCheck = "";
 
-        while(serverActive) {
-            try {
-                mss = new ServerSocket(port);
-				// Establish connection with the client
-				clientSocket = mss.accept();
-				System.out.println("Client connected");
-                
-                // En scanner der lytter til requests fra klienten
-                bis = new BufferedInputStream(clientSocket.getInputStream());
-
-                // PrintWriter så vi kan skrive til klienten
-                bos = new BufferedOutputStream(clientSocket.getOutputStream());
-			} catch (IOException e) {
-				System.out.println("Client not connected");
-			}
-
-            while (sameCon) {
-                nRead = bis.read(dataT);
-                byte[] data = byteCutoff(dataT, nRead);
-                dataString = byteToHex(data);
-
-                dataString = removeWhiteSpace(dataString);
-
-                int len = dataString.length();
-
-                System.out.println("Input: " + dataString);
-                System.out.println();
-
-                if (dataString.substring(0, 2*byteSize).equals("7878")) {
-                    packetLength = Integer.parseInt(dataString.substring(2*byteSize, 3*byteSize), 16);
-                    System.out.println("Length of the packet: " + packetLength);
-                    System.out.println();
-
-                    protocolNum = dataString.substring(3*byteSize, 4*byteSize);
-
-                    // isn = Integer.parseInt(dataString.substring(len-6*byteSize, len-4*byteSize), 16);   // When isn is of type int
-                    isn = dataString.substring(len-6*byteSize, len-4*byteSize);
-                    System.out.println("Information Serial Number: " + isn);
-                    System.out.println();
-
-                    errCheck = dataString.substring(len-4*byteSize, len-2*byteSize);
-
-                    System.out.println(errorCheck(dataString.substring(4, len-4*byteSize), errCheck));
-                    System.out.println();
-
-                    switch (protocolNum) {
-                        case "01":
-                            System.out.println("Login Message");
-                            System.out.println();
-                            handleLogin(dataString, isn);
-                            break;
-                        case "22":
-                            System.out.println("Location Message");
-                            System.out.println();
-                            handleLocation(dataString);
-                            break;
-                        case "12":
-                            break;
-                        case "13":
-                            System.out.println("Status Message");
-                            System.out.println();
-                            handleStatus(dataString, isn);
-                            sendCommand(isn);
-                            break;
-                        case "15":
-                            System.out.println("Command Response");
-                            break;
-                        case "26":
-                            break;
-                        case "16":
-                            break;
-                        case "80":
-                            break;
-                        case "f3":
-                            break;
-                        case "f1":
-                            break;
-                        case "f2":
-                            break;
-                        case "8a":
-                            break;
-                        default:
-                            System.out.println("No such command");
-                            break;
-                    }
-                }
-                else {
-                    System.out.println("Wrong start");
-                }
-            }
-            serverActive = false;
+        try {
+            bis = new BufferedInputStream(socket.getInputStream());
+            bos = new BufferedOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            System.out.println("Wrong when setting up");
+            e.printStackTrace();
         }
 
-        bis.close();
-        bos.close();
-        clientSocket.close();
-        mss.close();
+        try {
+            while (sameCon) {
+                while ((nRead = bis.read(dataT)) != -1) {
+                    byte[] data = byteCutoff(dataT, nRead);
+                    dataString = byteToHex(data);
+
+                    dataString = removeWhiteSpace(dataString);
+
+                    int len = dataString.length();
+
+                    System.out.println("Input: " + dataString);
+                    System.out.println();
+
+                    if (dataString.substring(0, 2*byteSize).equals("7878")) {
+                        packetLength = Integer.parseInt(dataString.substring(2*byteSize, 3*byteSize), 16);
+                        System.out.println("Length of the packet: " + packetLength);
+                        System.out.println();
+
+                        protocolNum = dataString.substring(3*byteSize, 4*byteSize);
+
+                        // isn = Integer.parseInt(dataString.substring(len-6*byteSize, len-4*byteSize), 16);   // When isn is of type int
+                        isn = dataString.substring(len-6*byteSize, len-4*byteSize);
+                        System.out.println("Information Serial Number: " + isn);
+                        System.out.println();
+
+                        errCheck = dataString.substring(len-4*byteSize, len-2*byteSize);
+
+                        System.out.println(errorCheck(dataString.substring(4, len-4*byteSize), errCheck));
+                        System.out.println();
+
+                        switch (protocolNum) {
+                            case "01":
+                                System.out.println("Login Message");
+                                System.out.println();
+                                handleLogin(dataString, isn);
+                                break;
+                            case "22":
+                                System.out.println("Location Message");
+                                System.out.println();
+                                handleLocation(dataString);
+                                break;
+                            case "12":
+                                break;
+                            case "13":
+                                System.out.println("Status Message");
+                                System.out.println();
+                                handleStatus(dataString, isn);
+                                try {
+                                    sendCommand(isn);
+                                } catch (IOException e) {
+                                    System.out.println("Failed to send command");
+                                    e.printStackTrace();
+                                }
+                                break;
+                            case "15":
+                                System.out.println("Command Response");
+                                break;
+                            case "26":
+                                break;
+                            case "16":
+                                break;
+                            case "80":
+                                break;
+                            case "f3":
+                                break;
+                            case "f1":
+                                break;
+                            case "f2":
+                                break;
+                            case "8a":
+                                break;
+                            default:
+                                System.out.println("No such command");
+                                break;
+                        }
+                    }
+                    else {
+                        System.out.println("Wrong start");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Reading from bis is failing");
+            e.printStackTrace();
+        }
     }
 
     private void handleLocation(String d) {
@@ -740,4 +739,5 @@ public class Server {
         String res = crcCalc(data);
         return res.equalsIgnoreCase(comp);
     }
+    
 }
