@@ -43,6 +43,7 @@ public class CRC_Table {
         }
 
         System.out.println("CRC16 = " + Integer.toHexString(crc^0xffff));
+        System.out.println();
 
         return Integer.toHexString(crc^0xffff);
         // return Integer.toHexString(~crc);

@@ -2,6 +2,7 @@ package Server;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.net.ServerSocket;
 import java.lang.Thread;
 
@@ -13,8 +14,16 @@ public class Server {
 	public BufferedInputStream bis = null;
 	public BufferedOutputStream bos = null;
 
-    public Server() {
+    public ArrayList<Client> clients = new ArrayList<Client>();
 
+    public Server() {
+        try {
+            mss = new ServerSocket(port);
+        }
+        catch (IOException e) {
+            System.out.println("Could not start server");
+            e.printStackTrace();
+        }
     }
 
     public void runServer() throws IOException {
@@ -31,17 +40,8 @@ public class Server {
                 clientThread.start();
             } catch (Exception e) {
                 System.out.println("Client not connected");
-            }
-            
-            // En Input Stream der lytter til requests fra klienten
-            // bis = new BufferedInputStream(clientSocket.getInputStream());
-
-            // Output Stream så vi kan skrive til klienten
-            // bos = new BufferedOutputStream(clientSocket.getOutputStream());
+            }          
         }
-
-        // bis.close();
-        // bos.close();
         clientSocket.close();
         mss.close();
     }
