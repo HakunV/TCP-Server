@@ -82,6 +82,7 @@ public class Client implements Runnable {
             System.out.println("Reading from bis is failing");
 
             cw.closeWriter();
+            server.removeClient(this);
             try {
                 bis.close();
                 bos.close();

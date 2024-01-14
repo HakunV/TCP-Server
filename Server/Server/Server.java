@@ -14,7 +14,7 @@ public class Server {
 	public BufferedInputStream bis = null;
 	public BufferedOutputStream bos = null;
 
-    public ArrayList<Client> clients = new ArrayList<Client>();
+    private ArrayList<Client> clients = new ArrayList<Client>();
 
     public Server() {
         try {
@@ -35,14 +35,20 @@ public class Server {
                 System.out.println("Client connected");
 
                 Client client = new Client(clientSocket, this);
+                clients.add(client);
 
-                Thread clientThread = new Thread(client);
-                clientThread.start();
+                new Thread(client).start();
             } catch (Exception e) {
                 System.out.println("Client not connected");
             }          
         }
         clientSocket.close();
         mss.close();
+    }
+
+    public void removeClient(Client client) {
+        if (clients.contains(client)) {
+            clients.remove(client);
+        }
     }
 }
