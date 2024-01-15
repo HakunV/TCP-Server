@@ -42,13 +42,36 @@ public class Server {
                 System.out.println("Client not connected");
             }          
         }
-        clientSocket.close();
         mss.close();
     }
 
     public void removeClient(ClientHandler client) {
         if (clients.contains(client)) {
             clients.remove(client);
+        }
+        try {
+            client.getSocket().close();
+        }
+        catch (IOException e) {
+            System.out.println("Failed when closing socket");
+            System.out.println();
+            e.printStackTrace();
+        }
+    }
+
+    public void removeDups(String imei, ClientHandler client) {
+        if (clients.size() <= 1) {
+            System.out.println("No Clients With This IMEI");
+            System.out.println();
+        }
+        else {
+            for (ClientHandler c : clients) {
+                if (c.getImei().equals(imei) && c != client) {
+                    c.disconnectSelf();
+                    System.out.println("Removed A Client");
+                    System.out.println();
+                }
+            }
         }
     }
 }

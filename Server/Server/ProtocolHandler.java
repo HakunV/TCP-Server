@@ -65,6 +65,7 @@ public class ProtocolHandler {
         String imei = d.substring(4*byteSize, 12*byteSize);
         imei = client.removeProZeros(imei);
         client.setName(imei);
+        client.checkDups();
         System.out.println("IMEI number: " + imei);
         System.out.println();
 

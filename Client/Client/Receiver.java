@@ -27,6 +27,7 @@ public class Receiver implements Runnable {
 
                     System.out.println("Input: " + dataString);
                     System.out.println();
+                    System.out.println("Write data:");
                 }
             }
         }

@@ -10,6 +10,7 @@ public class ClientHandler implements Runnable {
     private BufferedOutputStream bos;
     private ProtocolHandler ph;
     private ClientWriter cw;
+    private String imei = "";
 
     public String isn = "0000";  // Might change to int
 
@@ -76,19 +77,26 @@ public class ClientHandler implements Runnable {
                     else {
                         System.out.println("Wrong start");
                     }
+                    if (Thread.interrupted()) {
+                        throw new IOException();
+                    }
+                }
+                if (Thread.interrupted()) {
+                    throw new IOException();
                 }
             }
         } catch (IOException e) {
             System.out.println("Reading from bis is failing");
 
-            cw.closeWriter();
-            server.removeClient(this);
             try {
                 bis.close();
                 bos.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+
+            cw.closeWriter();
+            server.removeClient(this);
 
             e.printStackTrace();
         }
@@ -100,7 +108,7 @@ public class ClientHandler implements Runnable {
 
     public void respondToLogin(String isn) throws IOException {
         cw.respondStandard("01", isn);
-        cw.sendCommand("3C535042534A2A503A42534A4750532A33503A303E");
+        // cw.sendCommand("3C535042534A2A503A42534A4750532A33503A303E");
     }
 
     public void respondToAlarm(String isn) throws IOException {
@@ -108,7 +116,24 @@ public class ClientHandler implements Runnable {
     }
 
     public void setName(String name) {
+        this.imei = name;
         cw.setWindowName(name);
+    }
+
+    public String getImei() {
+        return this.imei;
+    }
+
+    public void checkDups() {
+        server.removeDups(this.imei, this);;
+    }
+
+    public void disconnectSelf() {
+        Thread.currentThread().interrupt();
+    }
+
+    public Socket getSocket() {
+        return this.socket;
     }
 
     public String removeProZeros(String imei) {
