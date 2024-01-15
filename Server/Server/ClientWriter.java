@@ -49,15 +49,14 @@ public class ClientWriter {
 
         String protNum = "80";
         String serverFlags = "00000001";
-        //String command = "54494D45522C313023"; // 10 Min or 10 sec
-        String command = getCommand(str); // 1 Min or 1 sec
+        String command = getCommand(str);
 
         String language = "0002";
 
         int isnInt = Integer.parseInt(client.isn, 16);
         String serNum = String.format("%04X", isnInt+1);
 
-        int commandLen = command.length()/2;
+        int commandLen = (serverFlags.length()+command.length())/2;
         String comLenStr = String.format("%02X", commandLen);
 
         respond = protNum + comLenStr + serverFlags + command + language + serNum;

@@ -327,7 +327,7 @@ public class Window extends JFrame implements ActionListener, Runnable {
             input.requestFocus();
         }
         else if (e.getSource() == cancelGeo) {
-            input.setText("<SPBSJ*P:BSJGPS*3D:x,1111,m>");
+            input.setText("<SPBSJ*P:BSJGPS*3D:0>");
             input.setCaretPosition(19);
             input.requestFocus();
         }
@@ -350,7 +350,7 @@ public class Window extends JFrame implements ActionListener, Runnable {
         String timerCom = "    -  TIMER,T#    // T is in seconds\n";
         String workCom = "    -  <SPBSJ*P:BSJGPS*3P:x>    // replace x\n";
         String rebootCom = "    -  RESET#\n";
-        String numCom = "    -  <SPBSJ*P:BSJGPS*6F:car owner number>    // replace car owner number\n";
+        String numCom = "    -  <SPBSJ*P:BSJGPS*6F:car owner number>    // replace car owner number, to clear put \",,,,\"\n";
         String alarmNumCom = "    -  <SPBSJ*P:BSJGPS*3C:number>    // replace number\n";
         String cancelAlarmNumCom = "    -  <SPBSJ*P:BSJGPS*3C:00000000000>\n";
         String timeZoneCom = "    -  GMT,[A],[B],[C]#    // replace [A], [B] and [C]\n";
