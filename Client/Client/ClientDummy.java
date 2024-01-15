@@ -6,31 +6,33 @@ import java.net.UnknownHostException;
 import java.util.*;
 
 public class ClientDummy {
-    public static Socket client = null;
-    public static String ip = "localhost";
-    public static int port = 6666;
-    public static BufferedInputStream bis = null;
-    public static BufferedOutputStream bos = null;
-    public static Scanner scan = null;
+    public Socket client = null;
+    public String ip = "localhost";
+    public int port = 6666;
+    public BufferedInputStream bis = null;
+    public BufferedOutputStream bos = null;
+    public Scanner scan = null;
 
-    public static Receiver r;
+    public Receiver r = null;
 
-    public static void main(String[] args) throws IOException{
-        boolean active = true;
-
+    public ClientDummy() {
         try {
             client = new Socket(ip, port);
             bis = new BufferedInputStream(client.getInputStream());
             bos = new BufferedOutputStream(client.getOutputStream());
             scan = new Scanner(System.in);
 
-            r = new Receiver(bis);
+            r = new Client.Receiver(bis);
             new Thread(r).start();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void runClient() throws IOException {
+        boolean active = true;
 
         while (active) {
             System.out.println("Write data");
@@ -47,7 +49,7 @@ public class ClientDummy {
         bos.close();
     }
 
-    private static byte[] hexStrToByteArr(String data) {
+    private byte[] hexStrToByteArr(String data) {
         int len = data.length();
         byte[] bytes = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
