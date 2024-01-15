@@ -100,6 +100,7 @@ public class ClientHandler implements Runnable {
 
     public void respondToLogin(String isn) throws IOException {
         cw.respondStandard("01", isn);
+        cw.sendCommand("3C535042534A2A503A42534A4750532A33503A303E");
     }
 
     public void respondToAlarm(String isn) throws IOException {
