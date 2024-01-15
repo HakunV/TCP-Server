@@ -51,6 +51,8 @@ public class Server {
         }
         try {
             client.getSocket().close();
+            System.out.println("Client Connection Successfully Shut Down");
+            System.out.println();
         }
         catch (IOException e) {
             System.out.println("Failed when closing socket");
