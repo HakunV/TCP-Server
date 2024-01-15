@@ -3,11 +3,11 @@ package Server;
 import java.io.IOException;
 
 public class ProtocolHandler {
-    Client client;
+    ClientHandler client;
 
     private int byteSize = 2;
 
-    public ProtocolHandler(Client client) {
+    public ProtocolHandler(ClientHandler client) {
         this.client = client;
     }
 

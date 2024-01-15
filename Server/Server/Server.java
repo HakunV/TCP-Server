@@ -14,7 +14,7 @@ public class Server {
 	public BufferedInputStream bis = null;
 	public BufferedOutputStream bos = null;
 
-    private ArrayList<Client> clients = new ArrayList<Client>();
+    private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
 
     public Server() {
         try {
@@ -32,9 +32,9 @@ public class Server {
             try {
                 clientSocket = mss.accept();
 
-                System.out.println("Client connected");
+                System.out.println("Client connected: " + clientSocket.getInetAddress().getHostAddress());
 
-                Client client = new Client(clientSocket, this);
+                ClientHandler client = new ClientHandler(clientSocket, this);
                 clients.add(client);
 
                 new Thread(client).start();
@@ -46,7 +46,7 @@ public class Server {
         mss.close();
     }
 
-    public void removeClient(Client client) {
+    public void removeClient(ClientHandler client) {
         if (clients.contains(client)) {
             clients.remove(client);
         }

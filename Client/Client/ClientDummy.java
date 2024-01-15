@@ -1,3 +1,5 @@
+package Client;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -11,6 +13,8 @@ public class ClientDummy {
     public static BufferedOutputStream bos = null;
     public static Scanner scan = null;
 
+    public static Receiver r;
+
     public static void main(String[] args) throws IOException{
         boolean active = true;
 
@@ -19,11 +23,12 @@ public class ClientDummy {
             bis = new BufferedInputStream(client.getInputStream());
             bos = new BufferedOutputStream(client.getOutputStream());
             scan = new Scanner(System.in);
+
+            r = new Receiver(bis);
+            new Thread(r).start();
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

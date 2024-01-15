@@ -3,12 +3,12 @@ package Server;
 import java.io.*;
 
 public class ClientWriter {
-    private Client client;
+    private ClientHandler client;
     private BufferedOutputStream output;
     private Window window;
     
 
-    public ClientWriter(Client client, BufferedOutputStream bos) {
+    public ClientWriter(ClientHandler client, BufferedOutputStream bos) {
         this.client = client;
         this.output = bos;
 

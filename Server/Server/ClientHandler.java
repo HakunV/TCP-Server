@@ -3,7 +3,7 @@ package Server;
 import java.io.*;
 import java.net.Socket;
 
-public class Client implements Runnable {
+public class ClientHandler implements Runnable {
     private Socket socket;
     public Server server;
     private BufferedInputStream bis;
@@ -15,7 +15,7 @@ public class Client implements Runnable {
 
     public int byteSize = 2;
 
-    public Client(Socket socket, Server server) {
+    public ClientHandler(Socket socket, Server server) {
         this.socket = socket;
         this.server = server;
     }
