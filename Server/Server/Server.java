@@ -3,6 +3,7 @@ package Server;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.net.ServerSocket;
 import java.lang.Thread;
 
@@ -15,6 +16,7 @@ public class Server {
 	public BufferedOutputStream bos = null;
 
     private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
+    private HashMap<ClientHandler, Thread> clientThreads = new HashMap<ClientHandler, Thread>();
 
     public Server() {
         try {
@@ -37,7 +39,10 @@ public class Server {
                 ClientHandler client = new ClientHandler(clientSocket, this);
                 clients.add(client);
 
-                new Thread(client).start();
+                Thread cThread = new Thread(client);
+                clientThreads.put(client, cThread);
+
+                cThread.start();
             } catch (Exception e) {
                 System.out.println("Client not connected");
             }          
@@ -63,16 +68,23 @@ public class Server {
 
     public void removeDups(String imei, ClientHandler client) {
         if (clients.size() <= 1) {
-            System.out.println("No Clients With This IMEI");
+            System.out.println("No Other Clients With This IMEI");
             System.out.println();
         }
         else {
-            for (ClientHandler c : clients) {
-                if (c.getImei().equals(imei) && c != client) {
-                    c.disconnectSelf();
-                    System.out.println("Removed A Client");
-                    System.out.println();
+            if (clients.contains(client)) {
+                int i = clients.indexOf(client);
+                for (int j = 0; j < i; j++) {
+                    if (clients.get(j).getImei().equals(imei)) {
+                        removeClient(clients.get(j));
+                        System.out.println("Removed A Client");
+                        System.out.println();
+                    }
                 }
+            }
+            else {
+                System.out.println("This Client Does Not Exist");
+                System.out.println();
             }
         }
     }

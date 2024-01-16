@@ -12,6 +12,8 @@ public class ClientHandler implements Runnable {
     private ClientWriter cw;
     private String imei = "";
 
+    private boolean sameCon = true;
+
     public String isn = "0000";  // Might change to int
 
     public int byteSize = 2;
@@ -22,7 +24,6 @@ public class ClientHandler implements Runnable {
     }
 
     public void run() {
-        boolean sameCon = true;
         int n = 1024;
         int nRead = 0;
         byte[] dataT = new byte[n];
@@ -77,12 +78,6 @@ public class ClientHandler implements Runnable {
                     else {
                         System.out.println("Wrong start");
                     }
-                    if (Thread.interrupted()) {
-                        throw new IOException();
-                    }
-                }
-                if (Thread.interrupted()) {
-                    throw new IOException();
                 }
             }
         } catch (IOException e) {
@@ -128,8 +123,8 @@ public class ClientHandler implements Runnable {
         server.removeDups(this.imei, this);;
     }
 
-    public void disconnectSelf() {
-        Thread.currentThread().interrupt();
+    public void setEndFlag(boolean flag) {
+        this.sameCon = flag;
     }
 
     public Socket getSocket() {

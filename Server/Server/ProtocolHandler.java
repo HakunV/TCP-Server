@@ -65,18 +65,18 @@ public class ProtocolHandler {
         String imei = d.substring(4*byteSize, 12*byteSize);
         imei = client.removeProZeros(imei);
         client.setName(imei);
-        client.checkDups();
         System.out.println("IMEI number: " + imei);
         System.out.println();
 
         String typeID = d.substring(12*byteSize, 14*byteSize);
         System.out.println("Type ID: " + typeID);
-        System.out.println();
+        checkType(typeID);
 
         String timeZone = d.substring(14*byteSize, 16*byteSize);
-        System.out.println("Time zone: " + timeZone);
-        System.out.println();
+        System.out.println("Time zone:");
+        checkTimeZone(timeZone);
 
+        client.checkDups();
         try {
             client.respondToLogin(isn);
         } catch(IOException e) {
@@ -329,6 +329,37 @@ public class ProtocolHandler {
 
         int courseDegrees = Integer.parseInt(c.substring(6), 2);
         System.out.println("    Course In Degrees: " + courseDegrees);
+        System.out.println();
+    }
+
+    private void checkTimeZone(String tz) {
+        int tzInt = Integer.parseInt(tz, 16);
+        String t = String.format("%16s", Integer.toBinaryString(tzInt)).replace(" ", "0");
+
+        int timezone = Integer.parseInt(t.substring(0, 12), 2);
+
+        int districtInt = timezone/100;
+
+        String district = t.substring(12, 13).equals("0") ? "East" : "West";
+
+        if (district.equals("East")) {
+            System.out.println("    " + district + " District " + districtInt + ", GMT+" + districtInt + ":00");
+        }
+        else {
+            System.out.println("    " + district + " District " + districtInt + ", GMT-" + districtInt + ":00");
+        }
+        System.out.println();
+    }
+
+    private void checkType(String id) {
+        String oil = id.substring(2);
+
+        if (oil.equals("00")) {
+            System.out.println("    With Oil-Cut Function");
+        }
+        else {
+            System.out.println("    Without Oil-Cut Function");
+        }
         System.out.println();
     }
 
