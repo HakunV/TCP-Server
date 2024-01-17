@@ -51,10 +51,12 @@ public class ClientHandler implements Runnable {
 
                     dataString = removeWhiteSpace(dataString);
 
-                    int len = dataString.length();
+                    dataString = toLowerCase(dataString);
 
                     System.out.println("Input: " + dataString);
                     System.out.println();
+
+                    int len = dataString.length();
 
                     if (dataString.substring(0, 2*byteSize).equals("7878")) {
                         packetLength = Integer.parseInt(dataString.substring(2*byteSize, 3*byteSize), 16);
@@ -151,6 +153,26 @@ public class ClientHandler implements Runnable {
             d[i] = dataT[i];
         }
         return d;
+    }
+
+    public String toLowerCase(String str) {
+        String res = "";
+
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+
+            if (!Character.isDigit(c)) {
+                char cLower = c;
+                if (Character.isUpperCase(c)) {
+                    cLower = (char) (c ^ 0x20);
+                }
+                res += cLower;
+            }
+            else {
+                res += c;
+            } 
+        }
+        return res;
     }
 
     public String removeWhiteSpace(String in) {
