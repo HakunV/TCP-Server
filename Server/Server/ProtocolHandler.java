@@ -55,6 +55,11 @@ public class ProtocolHandler {
                 break;
             case "8a":
                 break;
+            case "2c":
+                System.out.println("Location Message");
+                System.out.println();
+                handleLocation(dataString);
+                break;
             default:
                 System.out.println("No such command");
                 break;
