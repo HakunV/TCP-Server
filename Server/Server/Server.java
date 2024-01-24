@@ -18,6 +18,9 @@ public class Server {
     private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
     private HashMap<ClientHandler, Thread> clientThreads = new HashMap<ClientHandler, Thread>();
 
+    /* 
+     * Creating the socket for the server to communicate with.
+     */
     public Server() {
         try {
             mss = new ServerSocket(port);
@@ -28,6 +31,9 @@ public class Server {
         }
     }
 
+    /*
+     * This is the server-loop, where the serversocket accepts clients and creates a thread for each socket-connection.
+     */
     public void runServer() throws IOException {
         boolean serverActive = true;
         while(serverActive) {
@@ -66,6 +72,9 @@ public class Server {
         }
     }
 
+    /*
+     * Looks for clients with same IMEI before the newest client, and removes the old clients
+     */
     public void removeDups(String imei, ClientHandler client) {
         if (clients.size() <= 1) {
             System.out.println("No Other Clients With This IMEI");

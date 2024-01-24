@@ -12,6 +12,9 @@ public class ProtocolHandler {
     }
 
     public void handleProtocol(String protocol, String dataString) {
+        /*
+         * The different kinds of packets are indicated by two hexadecimals
+         */
         switch (protocol) {
             case "01":
                 System.out.println("Login Message");
@@ -65,6 +68,10 @@ public class ProtocolHandler {
                 break;
         }
     }
+
+    /*
+     * The different kinds of packets have set bytes for each field
+     */
 
     private void handleLogin(String d, String isn) {
         String imei = d.substring(4*byteSize, 12*byteSize);

@@ -12,7 +12,7 @@ public class ClientHandler implements Runnable {
     private ClientWriter cw;
     private String imei = "";
 
-    private boolean sameCon = true;
+    private boolean clientActive = true;
 
     public String isn = "0000";  // Might change to int
 
@@ -24,9 +24,8 @@ public class ClientHandler implements Runnable {
     }
 
     public void run() {
-        int n = 1024;
         int nRead = 0;
-        byte[] dataT = new byte[n];
+        byte[] dataT = new byte[1024];
         String dataString = "";
         int packetLength = 0;
         String protocolNum = "";
@@ -44,20 +43,23 @@ public class ClientHandler implements Runnable {
         }
 
         try {
-            while (sameCon) {
+            while (clientActive) {
                 while ((nRead = bis.read(dataT)) != -1) {
-                    byte[] data = byteCutoff(dataT, nRead);
+                    byte[] data = byteCutoff(dataT, nRead); // Makes a new array with the size of nRead instead of 1024
                     dataString = byteToHex(data);
 
-                    dataString = removeWhiteSpace(dataString);
+                    dataString = removeWhiteSpace(dataString); // If there are whitespaces between bytes
 
-                    dataString = toLowerCase(dataString);
+                    dataString = toLowerCase(dataString); // If the hexadecimal is uppercase
 
                     System.out.println("Input: " + dataString);
                     System.out.println();
 
                     int len = dataString.length();
 
+                    /*
+                     * The packet should always start with 7878
+                     */
                     if (dataString.substring(0, 2*byteSize).equals("7878")) {
                         packetLength = Integer.parseInt(dataString.substring(2*byteSize, 3*byteSize), 16);
                         System.out.println("Length of the packet: " + packetLength);
@@ -72,7 +74,7 @@ public class ClientHandler implements Runnable {
 
                         errCheck = dataString.substring(len-4*byteSize, len-2*byteSize);
 
-                        System.out.println(errorCheck(dataString.substring(4, len-4*byteSize), errCheck));
+                        System.out.println(errorCheck(dataString.substring(4, len-4*byteSize), errCheck)); // Checks the error-check with CRC-ITU
                         System.out.println();
 
                         ph.handleProtocol(protocolNum, dataString);
@@ -126,13 +128,16 @@ public class ClientHandler implements Runnable {
     }
 
     public void setEndFlag(boolean flag) {
-        this.sameCon = flag;
+        this.clientActive = flag;
     }
 
     public Socket getSocket() {
         return this.socket;
     }
 
+    /*
+     * Removes proceeding zeros in a String
+     */
     public String removeProZeros(String imei) {
         int i = 0;
         while(imei.charAt(i) == '0') {
@@ -142,10 +147,17 @@ public class ClientHandler implements Runnable {
         return imei.substring(i);
     }
 
+    /*
+     * The GT06-packets always starts with "7878" and ends with "0d0a"
+     * This is used when sending packets to the client
+     */
     public String addStartEnd(String str) {
         return "7878" + str + "0d0a";
     }
 
+    /*
+     * Returns a new array with only the length of the bytes read, and with the same elements
+     */
     public byte[] byteCutoff(byte[] dataT, int nRead) {
         byte[] d = new byte[nRead];
 
