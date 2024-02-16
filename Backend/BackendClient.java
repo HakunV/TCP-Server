@@ -31,50 +31,33 @@ public class BackendClient {
             System.out.println("Could not connect to DTU");
             e.printStackTrace();
         }
-
     }
 
     public void runClient() throws IOException {
         while (active) {
-            // ArrayList<Integer> mes = new ArrayList<Integer>();
             String tempMes = "";
             String response = "";
             
             int fixed = Integer.parseInt("00010000", 2);
-            // tempMes.add(fixed);
             response += String.format("%02X", fixed);
-
-            // int lenMSB = Integer.parseInt("00000000", 2);
-            // // tempMes.add(msb);
-            // tempMes += String.format("%02X", lenMSB);
-
-            // int lenLSB = Integer.parseInt("00110000", 2);
-            // // tempMes.add(lsb);
-            // tempMes += String.format("%02X", lenLSB);
 
             int protLen = 4;
             tempMes += String.format("%04X", protLen);
 
             int m = 'M';
-            // tempMes.add(m);
             tempMes += String.format("%02X", m);
 
             int q = 'Q';
-            // tempMes.add(q);
             tempMes += String.format("%02X", q);
 
             int t = 'T';
-            // tempMes.add(t);
-            // tempMes.add(t);
             tempMes += String.format("%02X", t);
             tempMes += String.format("%02X", t);
 
             int level = Integer.parseInt("00000100", 2);
-            // tempMes.add(level);
             tempMes += String.format("%02X", level);
 
-            int flags = Integer.parseInt("10000010", 2);
-            // tempMes.add(flags);
+            int flags = Integer.parseInt("11000010", 2);
             tempMes += String.format("%02X", flags);
 
             int aliveMSB = Integer.parseInt("00000000", 2);
@@ -88,20 +71,26 @@ public class BackendClient {
             String client_ID = "8xQ6SK";
             String id_hex = textToHex(client_ID);
 
-            int lengthIDInt = id_hex.length()/2;
-            String lengthID = String.format("%04X", lengthIDInt);
+            String lengthID = String.format("%04X", client_ID);
 
             tempMes += lengthID;
             tempMes += id_hex;
 
-            String username = "6a2b0454-7bcb-46eb-8e77-37005d22d72c";
+            String username = "dtuadmin";
             String userHex = textToHex(username);
             
-            int lengthUserInt = userHex.length()/2;
-            String lengthUser = String.format("%04X", lengthUserInt);
+            String lengthUser = String.format("%04X", username.length());
 
             tempMes += lengthUser;
             tempMes += userHex;
+
+            String password = "$admiN@DTU#8024";
+            String passHex = textToHex(password);
+
+            String lengthPass = String.format("%04X", password.length());
+
+            tempMes += lengthPass;
+            tempMes += passHex;
 
             int mesLength = tempMes.length()/2;
             response += String.format("%02X", mesLength);
