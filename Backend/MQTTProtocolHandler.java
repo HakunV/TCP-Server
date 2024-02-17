@@ -4,68 +4,70 @@ import java.io.IOException;
 
 public class MQTTProtocolHandler {
     private BackendClient bc = null;
+    private int byteSize = 2;
 
     public MQTTProtocolHandler(BackendClient bc) {
         this.bc = bc;
     }
 
     public void handleMessage(String str) {
-        String protocol = str.substring(0, 2);
+        String protocol = str.substring(0, 1*byteSize/2);
 
         switch (protocol) {
-            case "20":
-                System.out.println("Connack Message Received");
+            case "2":
+                System.out.println("Connack Message Received:");
                 System.out.println();
                 handleConnack(str);
                 break;
-            case "30":
-                System.out.println("Publish Message Received");
+            case "3":
+                System.out.println("Publish Message Received:");
                 System.out.println();
                 handlePublish(str);
                 break;
-            case "40":
-                System.out.println("Puback Message Received");
+            case "4":
+                System.out.println("Puback Message Received:");
                 System.out.println();
                 handlePuback(str);
                 break;
-            case "50":
-                System.out.println("Pubrec Message Received");
+            case "5":
+                System.out.println("Pubrec Message Received:");
                 System.out.println();
                 handlePubrec(str);
                 break;
-            case "60":
-                System.out.println("Pubrel Message Received");
+            case "6":
+                System.out.println("Pubrel Message Received:");
                 System.out.println();
                 handlePubrel(str);
                 break;
-            case "70":
-                System.out.println("Pubcomp Message Received");
+            case "7":
+                System.out.println("Pubcomp Message Received:");
                 System.out.println();
                 handlePubcomp(str);
                 break;
-            case "90":
-                System.out.println("Suback Message Received");
+            case "9":
+                System.out.println("Suback Message Received:");
                 System.out.println();
                 handleSuback(str);
                 break;
-            case "b0":
-                System.out.println("Unsuback Message Received");
+            case "b":
+                System.out.println("Unsuback Message Received:");
                 System.out.println();
                 handleUnSuback(str);
                 break;
-            case "d0":
-                System.out.println("Pingresp Message Received");
+            case "d":
+                System.out.println("Pingresp Message Received:");
                 System.out.println();
                 handlePingresp(str);
                 break;
             default:
+                System.out.println("Packet Type Not Recognized");
+                System.out.println();
                 break;
         }
     }
 
     private void handlePingresp(String str) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handlePingresp'");
+
     }
 
     private void handleUnSuback(String str) {
@@ -94,16 +96,120 @@ public class MQTTProtocolHandler {
     }
 
     private void handlePuback(String str) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handlePuback'");
+        int length = Integer.parseInt(str.substring(1*byteSize, 2*byteSize), 16);
+
+        String packetID = str.substring(2*byteSize, 4*byteSize);
+        System.out.println("    Packet Identifier: " + packetID);
+        System.out.println();
+
+        String reasonCode = str.substring(4*byteSize, 5*byteSize);
+        System.out.println("    Reason Code: ");
+        switch (reasonCode) {
+            case "00":
+                System.out.print("Success");
+                System.out.println();
+                break;
+            case "10":
+                System.out.print("No Matchig Subscribers");
+                System.out.println();
+                break;
+            case "80":
+                System.out.print("Unspecified Error");
+                System.out.println();
+                break;
+            case "83":
+                System.out.print("Implementation Specific Error");
+                System.out.println();
+                break;
+            case "87":
+                System.out.print("Not Authorized");
+                System.out.println();
+                break;
+            case "90":
+                System.out.print("Topic Name Invalid");
+                System.out.println();
+                break;
+            case "91":
+                System.out.print("Packet Identifier In Use");
+                System.out.println();
+                break;
+            case "97":
+                System.out.print("Quota Exceeded");
+                System.out.println();
+                break;
+            case "99":
+                System.out.print("Payload Format Invalid");
+                System.out.println();
+                break;
+            default:
+                System.out.print("Could Not Recognize Reason Code");
+                System.out.println();
+                break;
+        }
+
+        if (length != 5*byteSize) {
+            int propLength = Integer.parseInt(str.substring(5*byteSize, 6*byteSize), 16);
+
+            if (propLength != 0) {
+                System.out.println("    Property: ");
+
+                String property = str.substring(6*byteSize, 7*byteSize) == "1f" ? "Reason String" : "User Property";
+                System.out.print(property);
+                System.out.println();
+            }
+        }
     }
 
     private void handlePublish(String str) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handlePublish'");
+        
     }
 
     public void handleConnack(String str) {
+        int length = Integer.parseInt(str.substring(2, 4), 16);
 
+        boolean session = Integer.parseInt(str.substring(4, 6), 16) == 1 ? true : false;
+        System.out.println("    Session Present: " + session);
+        System.out.println();
+
+        String returnCode = str.substring(6, 8);
+        System.out.println("    Return Code: ");
+        switch (returnCode) {
+            case "00":
+                System.out.print("Connection Accepted");
+                System.out.println();
+                break;
+            case "81":
+                System.out.print("Malformed Packet");
+                System.out.println();
+                break;
+            case "82":
+                System.out.print("Protocol Error");
+                System.out.println();
+                break;
+            case "84":
+                System.out.print("Unsupported Protocol Version");
+                System.out.println();
+                break;
+            case "85":
+                System.out.print("Client Identifier Not Valid");
+                System.out.println();
+                break;
+            case "86":
+                System.out.print("Bad Username Or Password");
+                System.out.println();
+                break;
+            case "95":
+                System.out.print("Packet Too Large");
+                System.out.println();
+                break;
+            case "8a":
+                System.out.print("Banned");
+                System.out.println();
+                break;
+            default:
+                System.out.print("Could Not Recognize Reason Code");
+                System.out.println();
+                break;
+        }
     }
 }
