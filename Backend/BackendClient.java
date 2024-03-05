@@ -8,6 +8,7 @@ public class BackendClient {
     private Socket client = null;
     private String ip = "thingsofinter.net";
     private int port = 1883;
+    public Object waiter = null;
 
     private BufferedInputStream bis = null;
     private BufferedOutputStream bos = null;
@@ -18,6 +19,7 @@ public class BackendClient {
     private boolean active = true;
 
     public BackendClient() {
+        this.waiter = new Object();
         try {
             client = new Socket(ip, port);
             System.out.println("Connected to DTU");
@@ -27,7 +29,7 @@ public class BackendClient {
 
             s = new Sender(this, bos);
 
-            r = new Receiver(bis);
+            r = new Receiver(bis, this.waiter);
             new Thread(r).start();
         }
         catch(IOException e) {
@@ -39,6 +41,20 @@ public class BackendClient {
     public void runClient() throws IOException {
         while (active) {
             s.sendConnect();
+
+            while(!r.getConAcc()) {
+                synchronized(waiter) {
+                    try {
+                        waiter.wait();
+                    } catch (InterruptedException e) {
+                        System.out.println("Could not wait");
+                    }
+                }
+            }
+            System.out.println();
+            System.out.println("Accepted");
+
+            s.sendPublish(55.2344, 32.03432);
             this.active = false;
         }
     }

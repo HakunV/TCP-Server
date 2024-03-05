@@ -2,12 +2,12 @@ package Backend;
 
 import java.io.IOException;
 
-public class MQTTProtocolHandler {
-    private BackendClient bc = null;
+public class MQTT_ProtocolHandler {
+    private Receiver r = null;
     private int byteSize = 2;
 
-    public MQTTProtocolHandler(BackendClient bc) {
-        this.bc = bc;
+    public MQTT_ProtocolHandler(Receiver r) {
+        this.r = r;
     }
 
     public void handleMessage(String str) {
@@ -96,58 +96,60 @@ public class MQTTProtocolHandler {
     }
 
     private void handlePuback(String str) {
-        int length = Integer.parseInt(str.substring(1*byteSize, 2*byteSize), 16);
+        int length = recRemLen(str);
 
-        String packetID = str.substring(2*byteSize, 4*byteSize);
+        int packetID = Integer.parseInt(str.substring(2*byteSize, 4*byteSize));
         System.out.println("    Packet Identifier: " + packetID);
         System.out.println();
 
-        String reasonCode = str.substring(4*byteSize, 5*byteSize);
-        System.out.println("    Reason Code: ");
-        switch (reasonCode) {
-            case "00":
-                System.out.print("Success");
-                System.out.println();
-                break;
-            case "10":
-                System.out.print("No Matchig Subscribers");
-                System.out.println();
-                break;
-            case "80":
-                System.out.print("Unspecified Error");
-                System.out.println();
-                break;
-            case "83":
-                System.out.print("Implementation Specific Error");
-                System.out.println();
-                break;
-            case "87":
-                System.out.print("Not Authorized");
-                System.out.println();
-                break;
-            case "90":
-                System.out.print("Topic Name Invalid");
-                System.out.println();
-                break;
-            case "91":
-                System.out.print("Packet Identifier In Use");
-                System.out.println();
-                break;
-            case "97":
-                System.out.print("Quota Exceeded");
-                System.out.println();
-                break;
-            case "99":
-                System.out.print("Payload Format Invalid");
-                System.out.println();
-                break;
-            default:
-                System.out.print("Could Not Recognize Reason Code");
-                System.out.println();
-                break;
+        if (length > 4*byteSize) {
+            String reasonCode = str.substring(4*byteSize, 5*byteSize);
+            System.out.println("    Reason Code: ");
+            switch (reasonCode) {
+                case "00":
+                    System.out.print("Success");
+                    System.out.println();
+                    break;
+                case "10":
+                    System.out.print("No Matchig Subscribers");
+                    System.out.println();
+                    break;
+                case "80":
+                    System.out.print("Unspecified Error");
+                    System.out.println();
+                    break;
+                case "83":
+                    System.out.print("Implementation Specific Error");
+                    System.out.println();
+                    break;
+                case "87":
+                    System.out.print("Not Authorized");
+                    System.out.println();
+                    break;
+                case "90":
+                    System.out.print("Topic Name Invalid");
+                    System.out.println();
+                    break;
+                case "91":
+                    System.out.print("Packet Identifier In Use");
+                    System.out.println();
+                    break;
+                case "97":
+                    System.out.print("Quota Exceeded");
+                    System.out.println();
+                    break;
+                case "99":
+                    System.out.print("Payload Format Invalid");
+                    System.out.println();
+                    break;
+                default:
+                    System.out.print("Could Not Recognize Reason Code");
+                    System.out.println();
+                    break;
+            }
         }
 
-        if (length != 5*byteSize) {
+        if (length > 5*byteSize) {
             int propLength = Integer.parseInt(str.substring(5*byteSize, 6*byteSize), 16);
 
             if (propLength != 0) {
@@ -161,21 +163,23 @@ public class MQTTProtocolHandler {
     }
 
     private void handlePublish(String str) {
-        
+        int length = recRemLen(str);
     }
 
-    public void handleConnack(String str) {
-        int length = Integer.parseInt(str.substring(2, 4), 16);
+    private void handleConnack(String str) {
+        int length = recRemLen(str);
 
-        boolean session = Integer.parseInt(str.substring(4, 6), 16) == 1 ? true : false;
+        boolean session = Integer.parseInt(str.substring(2*byteSize, 3*byteSize), 16) == 1 ? true : false;
         System.out.println("    Session Present: " + session);
         System.out.println();
 
-        String returnCode = str.substring(6, 8);
+        String returnCode = str.substring(3*byteSize, 4*byteSize);
         System.out.println("    Return Code: ");
         switch (returnCode) {
             case "00":
-                System.out.print("Connection Accepted");
+                r.setConAcc(true);
+                r.wakeUp();
+                System.out.println("Connection Accepted");
                 System.out.println();
                 break;
             case "81":
@@ -211,5 +215,28 @@ public class MQTTProtocolHandler {
                 System.out.println();
                 break;
         }
+    }
+
+    public int recRemLen(String inLen) {
+        int start = 0;
+        int end = 2;
+
+        int multiplier = 1;
+        int value = 0;
+
+        int digit = Integer.parseInt(inLen.substring(start, end), 16);
+
+        while ((digit & 128) != 0) {
+            digit = Integer.parseInt(inLen.substring(start, end), 16);
+            value += (digit & 127) * multiplier;
+            multiplier *= 128;
+
+            if (inLen.length() > end) {
+                start += 2;
+                end += 2;
+            }
+        }
+
+        return value;
     }
 }

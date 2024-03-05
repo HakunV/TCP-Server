@@ -522,7 +522,7 @@ public class ProtocolHandler {
                 System.out.println();
                 break;
             case "001":
-                System.out.print("Shock Alarm");
+                System.out.print(" Shock Alarm");
                 System.out.println();
                 break;
             case "010":

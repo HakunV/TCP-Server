@@ -5,11 +5,17 @@ import java.io.IOException;
 
 public class Receiver implements Runnable {
     private BufferedInputStream bis;
+    private MQTT_ProtocolHandler mph = null;
+    public Object waiter = null;
 
     private boolean running = true;
 
-    public Receiver(BufferedInputStream bis) {
+    private boolean conAcc = false;
+
+    public Receiver(BufferedInputStream bis, Object waiter) {
         this.bis = bis;
+        this.mph = new MQTT_ProtocolHandler(this);
+        this.waiter = waiter;
     }
 
     public void run() {
@@ -22,14 +28,13 @@ public class Receiver implements Runnable {
                 while ((nRead = bis.read(dataT)) != -1) {
                     byte[] data = byteCutoff(dataT, nRead);
 
-                    System.out.println("Input Before Hex: " + dataString);
-                    System.out.println();
-
                     dataString = byteToHex(data);
                     dataString = removeWhiteSpace(dataString);
 
-                    System.out.println("Input After Hex: " + dataString);
+                    System.out.println("Input: " + dataString);
                     System.out.println();
+
+                    mph.handleMessage(dataString);
                 }
             }
         }
@@ -68,5 +73,17 @@ public class Receiver implements Runnable {
             sb.append(String.format("%02X ", b));
         }
         return sb.toString();
+    }
+
+    public void setConAcc(boolean b) {
+        this.conAcc = b;
+    }
+
+    public boolean getConAcc() {return this.conAcc;}
+
+    public void wakeUp() {
+        synchronized(waiter) {
+            waiter.notify();
+        }
     }
 }
