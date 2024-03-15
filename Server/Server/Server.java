@@ -50,7 +50,6 @@ public class Server {
 
                 cThread.start();
             } catch (Exception e) {
-                System.out.println("Client not connected");
             }          
         }
         mss.close();
