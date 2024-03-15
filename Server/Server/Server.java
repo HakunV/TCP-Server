@@ -37,6 +37,7 @@ public class Server {
     public void runServer() throws IOException {
         boolean serverActive = true;
         while(serverActive) {
+            System.out.println("Server Running");
             try {
                 clientSocket = mss.accept();
 
