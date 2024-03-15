@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.lang.Thread;
 
 public class Server {
-    public int port = 22;
+    public int port = 80;
 
 	public ServerSocket mss = null;
     public Socket clientSocket;
@@ -24,6 +24,7 @@ public class Server {
     public Server() {
         try {
             mss = new ServerSocket(port);
+            System.out.println("Server Running");
         }
         catch (IOException e) {
             System.out.println("Could not start server");
@@ -37,7 +38,6 @@ public class Server {
     public void runServer() throws IOException {
         boolean serverActive = true;
         while(serverActive) {
-            System.out.println("Server Running");
             try {
                 clientSocket = mss.accept();
 
