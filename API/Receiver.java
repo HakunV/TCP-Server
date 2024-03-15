@@ -1,21 +1,15 @@
-package Backend;
+package API;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 
 public class Receiver implements Runnable {
     private BufferedInputStream bis;
-    private MQTT_ProtocolHandler mph = null;
-    public Object waiter = null;
 
     private boolean running = true;
 
-    private boolean conAcc = false;
-
-    public Receiver(BufferedInputStream bis, Object waiter) {
+    public Receiver(BufferedInputStream bis) {
         this.bis = bis;
-        this.mph = new MQTT_ProtocolHandler(this);
-        this.waiter = waiter;
     }
 
     public void run() {
@@ -30,12 +24,9 @@ public class Receiver implements Runnable {
 
                     dataString = byteToHex(data);
                     dataString = removeWhiteSpace(dataString);
-                    dataString = toLowerCase(dataString);
 
                     System.out.println("Input: " + dataString);
                     System.out.println();
-
-                    mph.handleMessage(dataString);
                 }
             }
         }
@@ -74,37 +65,5 @@ public class Receiver implements Runnable {
             sb.append(String.format("%02X ", b));
         }
         return sb.toString();
-    }
-
-    public String toLowerCase(String str) {
-        String res = "";
-
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-
-            if (!Character.isDigit(c)) {
-                char cLower = c;
-                if (Character.isUpperCase(c)) {
-                    cLower = (char) (c ^ 0x20);
-                }
-                res += cLower;
-            }
-            else {
-                res += c;
-            } 
-        }
-        return res;
-    }
-
-    public void setConAcc(boolean b) {
-        this.conAcc = b;
-    }
-
-    public boolean getConAcc() {return this.conAcc;}
-
-    public void wakeUp() {
-        synchronized(waiter) {
-            waiter.notify();
-        }
     }
 }

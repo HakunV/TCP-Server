@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.lang.Thread;
 
 public class Server {
-    public int port = 1883;
+    public int port = 40321;
 
 	public ServerSocket mss = null;
     public Socket clientSocket;

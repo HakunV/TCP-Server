@@ -67,7 +67,8 @@ public class MQTT_ProtocolHandler {
     }
 
     private void handlePingresp(String str) {
-
+        System.out.println("The server responded");
+        System.out.println();
     }
 
     private void handleUnSuback(String str) {

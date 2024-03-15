@@ -138,8 +138,48 @@ public class Sender {
             sendMessage(message, bos);
         }
         catch (IOException e) {
-            System.out.println("Could Not Send Publish Packet Packet");
+            System.out.println("Could Not Send Publish Packet");
             e.printStackTrace();
+        }
+    }
+
+    public void sendPing() {
+        String mes = "";
+
+        String packetType = String.format("%01X", 12);
+        mes += packetType;
+
+        String reserved = String.format("%01X", 0);
+        mes += reserved;
+
+        String remLength = String.format("%02X", 0);
+        mes += remLength;
+
+        try {
+            sendMessage(mes, bos);
+        }
+        catch(IOException e) {
+            System.out.println("Could Not Send Ping Packet");
+        }
+    }
+
+    public void sendDisconnect() {
+        String mes = "";
+
+        String packetType = String.format("%01X", 14);
+        mes += packetType;
+
+        String reserved = String.format("%01X", 0);
+        mes += reserved;
+
+        String remLength = String.format("%02X", 0);
+        mes += remLength;
+
+        try {
+            sendMessage(mes, bos);
+        }
+        catch(IOException e) {
+            System.out.println("Could Not Send Disconnect Packet");
         }
     }
 
@@ -177,6 +217,7 @@ public class Sender {
 
     public void sendMessage(String mes, BufferedOutputStream bos) throws IOException {
         System.out.println("Message: " + mes);
+        System.out.println();
 
         byte[] mesBytes = hexStrToByteArr(mes);
         // byte[] mesBytes = mes.getBytes();
@@ -185,6 +226,7 @@ public class Sender {
         bos.flush();
 
         System.out.println("Sent packet");
+        System.out.println();
     }
 
     public String textToHex(String s) {
