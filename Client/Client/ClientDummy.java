@@ -7,8 +7,8 @@ import java.util.*;
 
 public class ClientDummy {
     public Socket client = null;
-    public String ip = "localhost";
-    public int port = 6666;
+    public String ip = "thingsofinter.net";
+    public int port = 8080;
     public BufferedInputStream bis = null;
     public BufferedOutputStream bos = null;
     public Scanner scan = null;
