@@ -8,7 +8,7 @@ import java.util.*;
 public class ClientDummy {
     public Socket client = null;
     public String ip = "159.65.118.39";
-    public int port = 40321;
+    public int port = 30001;
     public BufferedInputStream bis = null;
     public BufferedOutputStream bos = null;
     public Scanner scan = null;
