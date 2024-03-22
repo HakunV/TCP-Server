@@ -5,7 +5,7 @@ import java.io.*;
 public class ClientWriter {
     private ClientHandler client;
     private BufferedOutputStream output;
-    private Window window;
+    // private Window window;
     
 
     public ClientWriter(ClientHandler client, BufferedOutputStream bos) {
@@ -92,7 +92,7 @@ public class ClientWriter {
         return hexStr;
     }
 
-    public void setWindowName(String name) {
-        window.setTitle("Terminal: " + name);
-    }
+    // public void setWindowName(String name) {
+    //     window.setTitle("Terminal: " + name);
+    // }
 }
