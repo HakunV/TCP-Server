@@ -164,7 +164,15 @@ public class MQTT_ProtocolHandler {
     }
 
     private void handlePublish(String str) {
+        String flags = str.substring(1*byteSize/2, 1*byteSize);
+        boolean dup = flags.substring(0, 1).equals("0") ? false : true;
+        int qos = Integer.parseInt(flags.substring(1, 3));
+        boolean retain = flags.substring(3, 4).equals("0") ? false : true;
+
         int length = recRemLen(str);
+
+        int topicLength = Integer.parseInt(str.substring(3*byteSize, 5*byteSize));
+
     }
 
     private void handleConnack(String str) {

@@ -12,14 +12,14 @@ public class ClientWriter {
         this.client = client;
         this.output = bos;
 
-        window = new Window(this);
-        Thread tw = new Thread(window);
+        // window = new Window(this);
+        // Thread tw = new Thread(window);
 
-        tw.start();
+        // tw.start();
     }
 
     public void closeWriter() {
-        window.closeWindow();
+        // window.closeWindow();
     }
 
     public void respondStandard(String prot, String isn) throws IOException{
