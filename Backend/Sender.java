@@ -79,6 +79,8 @@ public class Sender {
         tempMes += lengthPass;
         tempMes += passHex;
 
+        // Calculate Remaining Length
+
         int mesLength = tempMes.length()/2;
         message += String.format("%02X", mesLength);
         message += tempMes;
@@ -111,7 +113,7 @@ public class Sender {
         String topic = "DTU-IWP-DeviceData";
         String topicHex = textToHex(topic);
 
-        int topicLength = topic.length();
+        int topicLength = topicHex.length()/2;
         tempMes += String.format("%04X", topicLength);
         tempMes += topicHex;
 
@@ -128,14 +130,59 @@ public class Sender {
 
         tempMes += payloadHex;
 
+        // Calculate Remaining Length
+
         int mesLength = tempMes.length()/2;
-        System.out.println();
-        System.out.println("Remaining Length: " + mesLength);
         message += calcRemLen(mesLength);
         message += tempMes;
 
         try {
             sendMessage(message, bos);
+        }
+        catch (IOException e) {
+            System.out.println("Could Not Send Publish Packet");
+            e.printStackTrace();
+        }
+    }
+
+    public void sendSubscribe() {
+        String mes = "";
+        String tempMes = "";
+
+        // Fixed Header
+
+        String packetType = String.format("%01X", 8);
+        mes += packetType;
+
+        String reserved = String.format("%01X", 2);
+        mes += reserved;
+
+        // Variable Header
+
+        String packetID = String.format("%04X", 5832);
+        tempMes += packetID;
+
+        // int propLength = 0;
+        // tempMes += String.format("%02X", propLength);
+
+        // payload
+
+        String topic = textToHex("DTU-IWP-DeviceData");
+        int topicLength = topic.length()/2;
+        tempMes += String.format("%04X", topicLength);
+        tempMes += topic;
+
+        int flags = Integer.parseInt("00000010", 2);
+        tempMes += String.format("%02X", flags);
+
+        // Calculate Remaining Length
+
+        int mesLength = tempMes.length()/2;
+        mes += calcRemLen(mesLength);
+        mes += tempMes;
+
+        try {
+            sendMessage(mes, bos);
         }
         catch (IOException e) {
             System.out.println("Could Not Send Publish Packet");

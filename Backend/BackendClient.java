@@ -39,25 +39,26 @@ public class BackendClient {
     }
 
     public void runClient() throws IOException {
-        while (active) {
-            s.sendConnect();
+        s.sendConnect();
 
-            while(!r.getConAcc()) {
-                synchronized(waiter) {
-                    try {
-                        waiter.wait();
-                    } catch (InterruptedException e) {
-                        System.out.println("Could not wait");
-                    }
+        while(!r.getConAcc()) {
+            synchronized(waiter) {
+                try {
+                    waiter.wait();
+                } catch (InterruptedException e) {
+                    System.out.println("Could not wait");
                 }
             }
-            System.out.println("Accepted");
-            System.out.println();
+        }
+        System.out.println("Accepted");
+        System.out.println();
 
-            // s.sendPublish(55.2344, 32.03432);
-            s.sendPing();
-            s.sendDisconnect();
-            this.active = false;
+        // s.sendPublish(55.2344, 32.03432);
+        s.sendPing();
+        s.sendSubscribe();
+
+        while (active) {
+            
         }
     }
 }
